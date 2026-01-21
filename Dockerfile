@@ -27,6 +27,9 @@ WORKDIR /var/www
 # Copy existing application directory contents
 COPY . /var/www
 
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
 RUN npm install && npm run build
 
 RUN chown -R www-data:www-data /var/www \
