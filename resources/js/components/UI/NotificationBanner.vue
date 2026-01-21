@@ -1,14 +1,17 @@
 <script setup>
 defineProps({
-    message: String,
+    message: {
+        type: String,
+        default: '',
+    },
     type: {
         type: String,
-        default: "success", // 'success' or 'error'
-        validator: (value) => ["success", "error"].includes(value),
+        default: 'success', // 'success' or 'error'
+        validator: (value) => ['success', 'error'].includes(value),
     },
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(['close']);
 </script>
 
 <template>
@@ -21,11 +24,11 @@ const emit = defineEmits(["close"]);
                 : 'bg-red-100 text-red-700 border-red-200'
         "
     >
-        <span> {{ type === "success" ? "✅" : "⚠️" }} {{ message }} </span>
+        <span> {{ type === 'success' ? '✅' : '⚠️' }} {{ message }} </span>
         <button
-            @click="emit('close')"
             class="font-bold"
             :class="type === 'success' ? 'text-green-900' : 'text-red-900'"
+            @click="emit('close')"
         >
             &times;
         </button>

@@ -1,12 +1,24 @@
 <script setup>
 defineProps({
-    tasks: Array,
-    loading: Boolean,
-    perPage: Number,
-    statusFilter: String,
+    tasks: {
+        type: Array,
+        default: () => [],
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    perPage: {
+        type: Number,
+        default: 10,
+    },
+    statusFilter: {
+        type: String,
+        default: '',
+    },
 });
 
-const emit = defineEmits(["delete", "update-status"]);
+const emit = defineEmits(['delete', 'update-status']);
 </script>
 
 <template>
@@ -19,71 +31,40 @@ const emit = defineEmits(["delete", "update-status"]);
         </div>
 
         <div class="overflow-x-auto" :class="{ 'opacity-50': loading }">
-            <table
-                class="w-full border-collapse border border-gray-200 table-fixed"
-            >
+            <table class="w-full border-collapse border border-gray-200 table-fixed">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th
-                            class="border p-2 text-left font-semibold text-gray-600 w-1/2"
-                        >
-                            Title & Description
-                        </th>
-                        <th
-                            class="border p-2 text-left font-semibold text-gray-600 w-32"
-                        >
-                            Status
-                        </th>
-                        <th
-                            class="border p-2 text-left font-semibold text-gray-600 w-32"
-                        >
-                            Due Date
-                        </th>
-                        <th
-                            class="border p-2 text-center font-semibold text-gray-600 w-24"
-                        >
-                            Actions
-                        </th>
+                        <th class="border p-2 text-left font-semibold text-gray-600 w-1/2">Title & Description</th>
+                        <th class="border p-2 text-left font-semibold text-gray-600 w-32">Status</th>
+                        <th class="border p-2 text-left font-semibold text-gray-600 w-32">Due Date</th>
+                        <th class="border p-2 text-center font-semibold text-gray-600 w-24">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="task in tasks"
-                        :key="task.id"
-                        class="hover:bg-gray-50 transition h-24"
-                    >
+                    <tr v-for="task in tasks" :key="task.id" class="hover:bg-gray-50 transition h-24">
                         <td class="border p-3 align-top">
-                            <div
-                                class="font-bold text-gray-800 truncate"
-                                :title="task.title"
-                            >
+                            <div class="font-bold text-gray-800 truncate" :title="task.title">
                                 {{ task.title }}
                             </div>
-                            <div
-                                class="text-sm text-gray-500 mt-1 line-clamp-2"
-                                :title="task.description"
-                            >
+                            <div class="text-sm text-gray-500 mt-1 line-clamp-2" :title="task.description">
                                 {{ task.description }}
                             </div>
                         </td>
                         <td class="border p-2 align-top">
                             <select
                                 :value="task.status"
+                                class="border p-1 rounded text-sm w-full"
+                                :class="{
+                                    'bg-yellow-50 text-yellow-700 border-yellow-200': task.status === 'pending',
+                                    'bg-blue-50 text-blue-700 border-blue-200': task.status === 'in_progress',
+                                    'bg-green-50 text-green-700 border-green-200': task.status === 'completed',
+                                }"
                                 @change="
                                     emit('update-status', {
                                         ...task,
                                         status: $event.target.value,
                                     })
                                 "
-                                class="border p-1 rounded text-sm w-full"
-                                :class="{
-                                    'bg-yellow-50 text-yellow-700 border-yellow-200':
-                                        task.status === 'pending',
-                                    'bg-blue-50 text-blue-700 border-blue-200':
-                                        task.status === 'in_progress',
-                                    'bg-green-50 text-green-700 border-green-200':
-                                        task.status === 'completed',
-                                }"
                             >
                                 <option value="pending">Pending</option>
                                 <option value="in_progress">In Progress</option>
@@ -94,23 +75,17 @@ const emit = defineEmits(["delete", "update-status"]);
                             {{ task.due_date }}
                         </td>
                         <td class="border p-2 text-center align-top">
-                            <button
-                                @click="emit('delete', task.id)"
-                                class="text-red-500 hover:text-red-700 p-1"
-                            >
+                            <button class="text-red-500 hover:text-red-700 p-1" @click="emit('delete', task.id)">
                                 🗑️
                             </button>
                         </td>
                     </tr>
                     <!-- Spacer rows -->
-                    <tr
-                        v-if="tasks.length < perPage"
-                        v-for="i in perPage - tasks.length"
-                        :key="'empty-' + i"
-                        class="h-24"
-                    >
-                        <td colspan="4" class="border p-2"></td>
-                    </tr>
+                    <template v-if="tasks.length < perPage">
+                        <tr v-for="i in perPage - tasks.length" :key="'empty-' + i" class="h-24">
+                            <td colspan="4" class="border p-2"></td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>

@@ -68,6 +68,73 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
     docker-compose down
     ```
 
+## Development & Quality Assurance
+
+### Running Tests
+
+Run the complete test suite:
+
+```bash
+php artisan test
+```
+
+### Static Analysis (Larastan)
+
+Run PHPStan for static analysis:
+
+```bash
+./vendor/bin/phpstan analyse --memory-limit=2G
+```
+
+### Code Formatting (Pint)
+
+Fix code style issues automatically:
+
+```bash
+./vendor/bin/pint --parallel
+```
+
+### Profanity Check
+
+Check for profanity in the codebase:
+
+```bash
+./vendor/bin/pest --profanity
+```
+
+### Type Coverage
+
+Check type coverage (enforces 100%):
+
+```bash
+php -d memory_limit=2G ./vendor/bin/pest --type-coverage
+```
+
+### IDE Helper
+
+Generate helper files for IDE autocompletion:
+
+```bash
+php artisan ide-helper:generate
+php artisan ide-helper:meta
+php artisan ide-helper:models --nowrite
+```
+
+### Frontend Linting
+
+Lint and fix frontend code (Vue/JS):
+
+```bash
+npm run lint
+```
+
+### Git Hooks (Husky)
+
+Commands run automatically before commit:
+
+- `Pint` (Formats PHP code)
+- `Pest` (Runs tests)
+
 ## API Documentation
 
 ### Endpoints

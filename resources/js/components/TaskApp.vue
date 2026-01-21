@@ -1,23 +1,23 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
 // Components
-import NotificationBanner from "./UI/NotificationBanner.vue";
-import ConfirmationModal from "./UI/ConfirmationModal.vue";
-import Pagination from "./UI/Pagination.vue";
-import TaskForm from "./Tasks/TaskForm.vue";
-import TaskList from "./Tasks/TaskList.vue";
-import TaskFilters from "./Tasks/TaskFilters.vue";
+import NotificationBanner from './UI/NotificationBanner.vue';
+import ConfirmationModal from './UI/ConfirmationModal.vue';
+import Pagination from './UI/Pagination.vue';
+import TaskForm from './Tasks/TaskForm.vue';
+import TaskList from './Tasks/TaskList.vue';
+import TaskFilters from './Tasks/TaskFilters.vue';
 
 // Data
 const tasks = ref([]);
 const loading = ref(false);
 
 // UI State
-const statusFilter = ref("");
-const successMessage = ref("");
-const errorMessage = ref("");
+const statusFilter = ref('');
+const successMessage = ref('');
+const errorMessage = ref('');
 const tasksContainer = ref(null);
 const confirmDeleteId = ref(null);
 const taskFormRef = ref(null);
@@ -34,23 +34,14 @@ const pagination = ref({
 
 // Helper for Notifications
 const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-};
-
-const scrollToTasks = () => {
-    if (tasksContainer.value) {
-        tasksContainer.value.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-        });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 const showSuccess = (msg) => {
     successMessage.value = msg;
     scrollToTop();
     setTimeout(() => {
-        successMessage.value = "";
+        successMessage.value = '';
     }, 3000);
 };
 
@@ -58,7 +49,7 @@ const showError = (msg) => {
     errorMessage.value = msg;
     scrollToTop();
     setTimeout(() => {
-        errorMessage.value = "";
+        errorMessage.value = '';
     }, 5000);
 };
 
@@ -74,7 +65,7 @@ const fetchTasks = async () => {
             params.status = statusFilter.value;
         }
 
-        const { data } = await axios.get("/api/tasks", { params });
+        const { data } = await axios.get('/api/tasks', { params });
 
         tasks.value = data.data || [];
 
@@ -86,8 +77,8 @@ const fetchTasks = async () => {
             };
         }
     } catch (err) {
-        console.error("Error fetching tasks", err);
-        showError("Failed to load tasks.");
+        console.error('Error fetching tasks', err);
+        showError('Failed to load tasks.');
     } finally {
         loading.value = false;
     }
@@ -96,7 +87,7 @@ const fetchTasks = async () => {
 const handlePageChange = (link) => {
     if (!link.url || link.active) return;
     const url = new URL(link.url);
-    const page = url.searchParams.get("page");
+    const page = url.searchParams.get('page');
     if (page) {
         pagination.value.current_page = parseInt(page);
         fetchTasks();
@@ -105,24 +96,22 @@ const handlePageChange = (link) => {
 
 const createTask = async (taskData) => {
     try {
-        await axios.post("/api/tasks", taskData);
+        await axios.post('/api/tasks', taskData);
         // Reset form
         if (taskFormRef.value) {
             taskFormRef.value.reset();
         }
 
         pagination.value.current_page = 1;
-        statusFilter.value = ""; // Reset filter to see the new task
+        statusFilter.value = ''; // Reset filter to see the new task
         await fetchTasks();
-        showSuccess("Task created successfully!");
+        showSuccess('Task created successfully!');
     } catch (err) {
         if (err.response?.status === 422) {
-            const errors = Object.values(err.response.data.errors)
-                .flat()
-                .join(", ");
+            const errors = Object.values(err.response.data.errors).flat().join(', ');
             showError(errors);
         } else {
-            showError(err.response?.data?.message || "Failed to create task");
+            showError(err.response?.data?.message || 'Failed to create task');
         }
     }
 };
@@ -137,9 +126,9 @@ const updateStatus = async (task) => {
 
     try {
         await axios.put(`/api/tasks/${task.id}`, { ...task });
-        showSuccess("Task status updated!");
-    } catch (err) {
-        showError("Failed to update status");
+        showSuccess('Task status updated!');
+    } catch {
+        showError('Failed to update status');
         await fetchTasks(); // Revert on failure
     }
 };
@@ -153,42 +142,30 @@ const executeDelete = async () => {
     confirmDeleteId.value = null; // Close modal immediately
     try {
         await axios.delete(`/api/tasks/${id}`);
-        showSuccess("Task deleted successfully!");
+        showSuccess('Task deleted successfully!');
         await fetchTasks();
         if (tasks.value.length === 0 && pagination.value.current_page > 1) {
             pagination.value.current_page--;
             await fetchTasks();
         }
-    } catch (err) {
-        showError("Failed to delete task");
+    } catch {
+        showError('Failed to delete task');
     }
 };
 
 onMounted(() => {
-    console.info("[TaskApp] mounted");
+    console.info('[TaskApp] mounted');
     fetchTasks();
 });
 </script>
 
 <template>
-    <div
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white shadow-lg rounded-lg mt-6"
-    >
-        <h1 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">
-            Task Manager
-        </h1>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white shadow-lg rounded-lg mt-6">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">Task Manager</h1>
 
         <!-- Notifications -->
-        <NotificationBanner
-            :message="successMessage"
-            type="success"
-            @close="successMessage = ''"
-        />
-        <NotificationBanner
-            :message="errorMessage"
-            type="error"
-            @close="errorMessage = ''"
-        />
+        <NotificationBanner :message="successMessage" type="success" @close="successMessage = ''" />
+        <NotificationBanner :message="errorMessage" type="error" @close="errorMessage = ''" />
 
         <!-- Modals -->
         <ConfirmationModal
@@ -230,20 +207,13 @@ onMounted(() => {
             />
 
             <!-- Loading/Empty State -->
-            <div
-                v-if="loading && tasks.length === 0"
-                class="text-center py-10 text-gray-500"
-            >
-                Loading tasks...
-            </div>
+            <div v-if="loading && tasks.length === 0" class="text-center py-10 text-gray-500">Loading tasks...</div>
 
             <div
                 v-else-if="tasks.length === 0"
                 class="text-center py-10 bg-gray-50 rounded text-gray-500 border border-dashed"
             >
-                <span v-if="statusFilter"
-                    >No tasks found with status "{{ statusFilter }}".</span
-                >
+                <span v-if="statusFilter">No tasks found with status "{{ statusFilter }}".</span>
                 <span v-else>No tasks found. Create one above!</span>
             </div>
 
@@ -258,10 +228,7 @@ onMounted(() => {
                     @update-status="updateStatus"
                 />
 
-                <Pagination
-                    :links="pagination.links"
-                    @change-page="handlePageChange"
-                />
+                <Pagination :links="pagination.links" @change-page="handlePageChange" />
             </div>
         </div>
     </div>
