@@ -21,10 +21,10 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence(),
-            'description' => fake()->optional()->paragraph(),
-            'status' => fake()->randomElement(TaskStatus::cases()),
-            'due_date' => fake()->boolean() ? fake()->dateTimeBetween('now', '+1 year')->format('Y-m-d') : null,
+            'title' => $this->faker->sentence(),
+            'description' => $this->faker->optional()->paragraph(),
+            'status' => $this->faker->randomElement(TaskStatus::cases()),
+            'due_date' => $this->faker->boolean() ? $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d') : null,
         ];
     }
 }
