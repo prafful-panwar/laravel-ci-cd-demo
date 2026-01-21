@@ -16,8 +16,7 @@ class TaskController extends Controller
 {
     public function __construct(
         private readonly TaskService $taskService
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -52,7 +51,7 @@ class TaskController extends Controller
     {
         $task = $this->taskService->getTaskById((int) $id);
 
-        if (!$task) {
+        if (! $task) {
             return response()->json([
                 'message' => 'Task not found.',
             ], 404);
@@ -70,7 +69,7 @@ class TaskController extends Controller
     {
         $task = $this->taskService->getTaskById((int) $id);
 
-        if (!$task) {
+        if (! $task) {
             return response()->json([
                 'message' => 'Task not found.',
             ], 404);
@@ -91,7 +90,7 @@ class TaskController extends Controller
     {
         $task = $this->taskService->getTaskById((int) $id);
 
-        if (!$task) {
+        if (! $task) {
             return response()->json([
                 'message' => 'Task not found.',
             ], 404);

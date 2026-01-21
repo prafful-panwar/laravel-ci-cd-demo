@@ -5,8 +5,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-
-
 test('can list all tasks', function () {
 
     Task::factory()->count(5)->create([]);

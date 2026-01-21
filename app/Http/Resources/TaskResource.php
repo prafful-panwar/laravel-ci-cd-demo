@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin \App\Models\Task
+ *
  * @property \App\Enums\TaskStatus $status
  * @property \Illuminate\Support\Carbon|null $due_date
  */
