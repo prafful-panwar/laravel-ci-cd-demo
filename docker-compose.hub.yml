@@ -3,7 +3,7 @@ version: "3.8"
 services:
   app:
     image: praffulpanwar2016/task-app-ci-cd-demo:latest
-    container_name: task-app-ci-cd-demo-app
+    container_name: task-app-ci-cd-demo-app-hub
     restart: unless-stopped
     working_dir: /var/www
     depends_on:
@@ -16,42 +16,42 @@ services:
       DB_USERNAME: laravel
       DB_PASSWORD: password
     networks:
-      - task-app-ci-cd-demo-network
+      - task-app-ci-cd-demo-network-hub
 
   web:
     build:
       context: .
       dockerfile: Dockerfile.nginx
-    container_name: task-app-ci-cd-demo-web
+    container_name: task-app-ci-cd-demo-web-hub
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "8001:80"
     volumes:
       - ./:/var/www
     depends_on:
       - app
     networks:
-      - task-app-ci-cd-demo-network
+      - task-app-ci-cd-demo-network-hub
 
   db:
     image: mysql:8.0
-    container_name: task-app-ci-cd-demo-db
+    container_name: task-app-ci-cd-demo-db-hub
     restart: unless-stopped
     ports:
-      - "3307:3306"
+      - "3308:3306"
     environment:
       MYSQL_DATABASE: task-app-ci-cd-demo
       MYSQL_USER: laravel
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - dbdata:/var/lib/mysql
+      - dbdata-hub:/var/lib/mysql
     networks:
-      - task-app-ci-cd-demo-network
+      - task-app-ci-cd-demo-network-hub
 
 networks:
-  task-app-ci-cd-demo-network:
+  task-app-ci-cd-demo-network-hub:
     driver: bridge
 
 volumes:
-  dbdata:
+  dbdata-hub:

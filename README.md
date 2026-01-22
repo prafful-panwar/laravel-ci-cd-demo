@@ -88,9 +88,9 @@ Want to skip the build step? Use the pre-built image instead:
 docker-compose -f docker-compose.hub.yml up -d
 ```
 
-Access at [http://localhost:8000](http://localhost:8000)
+Access at [http://localhost:8001](http://localhost:8001)
 
-The `docker-compose.hub.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub.
+The `docker-compose.hub.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub and runs on port `8001` to avoid conflicts with the local build (port `8000`).
 
 ## Development & Quality Assurance
 
