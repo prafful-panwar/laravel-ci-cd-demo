@@ -63,7 +63,17 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
     - **Frontend**: [http://localhost:8000](http://localhost:8000)
     - **API**: [http://localhost:8000/api/tasks](http://localhost:8000/api/tasks)
 
-4.  **Stop Application**
+4.  **Verify Frontend (Optional)**
+
+    Run the browser test inside the Docker container to verify frontend is working:
+
+    ```bash
+    docker-compose exec app php artisan test tests/Browser/LandingPageTest.php
+    ```
+
+    This test checks that the page loads and displays "Task Manager".
+
+5.  **Stop Application**
     ```bash
     docker-compose down
     ```
