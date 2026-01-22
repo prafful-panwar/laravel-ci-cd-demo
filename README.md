@@ -83,13 +83,12 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
 Want to skip the build step? Use the pre-built image instead:
 
 ```bash
-cd verification
-docker-compose up -d
+docker-compose -f docker-compose.hub.yml up -d
 ```
 
-Access at [http://localhost:8080](http://localhost:8080)
+Access at [http://localhost:8000](http://localhost:8000)
 
-The `verification/docker-compose.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub.
+The `docker-compose.hub.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub.
 
 ## Development & Quality Assurance
 
