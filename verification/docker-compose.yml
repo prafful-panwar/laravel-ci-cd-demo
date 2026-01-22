@@ -3,14 +3,17 @@ version: '3.8'
 services:
     app:
         image: praffulpanwar2016/task-app-ci-cd-demo:latest
+        platform: linux/amd64
         restart: unless-stopped
         working_dir: /var/www
         volumes:
             - static_content:/var/www
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         environment:
             APP_URL: http://localhost:8080
+            ASSET_URL: http://localhost:8080
             APP_KEY: base64:2fl+Ktvkfl+Frkxvry1vF+I5/1G5Q/5K5+555555555=
             APP_DEBUG: true
             DB_CONNECTION: mysql
@@ -24,6 +27,7 @@ services:
 
     web:
         image: praffulpanwar2016/task-app-nginx:latest
+        platform: linux/amd64
         restart: unless-stopped
         ports:
             - '8080:80'
@@ -42,6 +46,11 @@ services:
             MYSQL_USER: laravel
             MYSQL_PASSWORD: password
             MYSQL_ROOT_PASSWORD: root
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+            interval: 10s
+            timeout: 5s
+            retries: 5
         networks:
             - docker-test-network
 
