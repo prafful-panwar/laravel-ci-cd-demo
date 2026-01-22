@@ -78,77 +78,20 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
     docker-compose down
     ```
 
-## Using Docker Hub Image
+## Using Docker Hub Pre-Built Image
 
-If you want to use the pre-built Docker Hub image instead of building locally:
-
-1.  **Clone the repository** (or use just the verification folder):
-
-    ```bash
-    git clone https://github.com/prafful-panwar/task-app-ci-cd-demo.git
-    cd task-app-ci-cd-demo
-    ```
-
-2.  **Update docker-compose.yml** to use the Hub image:
-
-    Change the `app` service from:
-    ```yaml
-    app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-    ```
-
-    To:
-    ```yaml
-    app:
-        image: praffulpanwar2016/task-app-ci-cd-demo:latest
-    ```
-
-    Or use the pre-configured `verification/docker-compose.yml` which already uses the Hub image.
-
-3.  **Pull and start**:
-
-    ```bash
-    # Pull the image
-    docker pull praffulpanwar2016/task-app-ci-cd-demo:latest
-
-    # Start services
-    docker-compose up -d
-    ```
-
-4.  **Access the application**:
-    - **Frontend**: [http://localhost:8000](http://localhost:8000)
-    - **API**: [http://localhost:8000/api/tasks](http://localhost:8000/api/tasks)
-
-5.  **Verify it's working**:
-
-    ```bash
-    # Test API
-    curl http://localhost:8000/api/tasks
-
-    # View logs
-    docker-compose logs app
-    ```
-
-6.  **Stop the application**:
-
-    ```bash
-    docker-compose down
-    ```
-
-### Using the Verification Folder
-
-We provide a pre-configured `verification/docker-compose.yml` for testing the Docker Hub image:
+Want to skip the build step? Use the pre-built image instead:
 
 ```bash
 cd verification
 docker-compose up -d
-curl http://localhost:8080/api/tasks
-docker-compose down
 ```
 
+Access at [http://localhost:8080](http://localhost:8080)
 
+The `verification/docker-compose.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub.
+
+## Development & Quality Assurance
 
 ### Running Tests
 
