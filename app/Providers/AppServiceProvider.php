@@ -19,10 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (\Illuminate\Support\Str::startsWith(config('app.url'), 'https://')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
-        } elseif (\Illuminate\Support\Str::startsWith(config('app.url'), 'http://')) {
-            \Illuminate\Support\Facades\URL::forceScheme('http');
-        }
+        //
     }
 }
