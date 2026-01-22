@@ -1,5 +1,7 @@
 # Task App (Laravel + Vue)
 
+A full-stack task management application built with Laravel 12 and Vue 3. Includes REST API, real-time task management, Docker support, and comprehensive testing.
+
 ## Setup
 
 1.  **Clone & Install**
@@ -42,9 +44,9 @@
     php artisan serve --port=8001
     ```
 
-    The API will be available at: `http://127.0.0.1:8001/api/{endpoints}`
+    The API will be available at: `http://127.0.0.1:8001/api/tasks` (and other endpoints)
 
-    _(Or if using Laravel Herd: `http://task-app-ci-cd.test/api/{endpoints}`)_
+    _(Or if using Laravel Herd: `http://task-app-ci-cd.test/api/tasks`)_
 
 ## Docker Setup (Recommended)
 
@@ -65,13 +67,13 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
 
 4.  **Verify Frontend (Optional)**
 
-    Run the browser test inside the Docker container to verify frontend is working:
+    Run the browser tests to verify the frontend loads correctly:
 
     ```bash
     docker-compose exec app php artisan test tests/Browser/LandingPageTest.php
     ```
 
-    This test checks that the page loads and displays "Task Manager".
+    This verifies the page loads without JavaScript errors and displays the app correctly.
 
 5.  **Stop Application**
     ```bash
