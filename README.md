@@ -78,7 +78,147 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
     docker-compose down
     ```
 
-## Development & Quality Assurance
+## Using Docker Hub Image
+
+If you want to use the pre-built Docker Hub image instead of building locally:
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- Internet connection to pull the image
+
+### Quick Start with Docker Hub Image
+
+1.  **Create a docker-compose file** (or use the verification folder):
+
+    ```yaml
+    version: '3.8'
+    services:
+        app:
+            image: praffulpanwar2016/task-app-ci-cd-demo:latest
+            restart: unless-stopped
+            working_dir: /var/www
+            environment:
+                APP_URL: http://localhost:8080
+                ASSET_URL: http://localhost:8080
+                APP_KEY: base64:2fl+Ktvkfl+Frkxvry1vF+I5/1G5Q/5K5+555555555=
+                APP_DEBUG: true
+                DB_CONNECTION: mysql
+                DB_HOST: db
+                DB_PORT: 3306
+                DB_DATABASE: task_app_test
+                DB_USERNAME: laravel
+                DB_PASSWORD: password
+            depends_on:
+                db:
+                    condition: service_healthy
+            networks:
+                - task-app-network
+
+        web:
+            build:
+                context: .
+                dockerfile: Dockerfile.nginx
+            restart: unless-stopped
+            ports:
+                - '8080:80'
+            volumes:
+                - .:/var/www
+            depends_on:
+                - app
+            networks:
+                - task-app-network
+
+        db:
+            image: mysql:8.0
+            restart: unless-stopped
+            environment:
+                MYSQL_DATABASE: task_app_test
+                MYSQL_USER: laravel
+                MYSQL_PASSWORD: password
+                MYSQL_ROOT_PASSWORD: root
+            healthcheck:
+                test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+                interval: 10s
+                timeout: 5s
+                retries: 5
+            networks:
+                - task-app-network
+
+    networks:
+        task-app-network:
+            driver: bridge
+    ```
+
+2.  **Pull and run the image**:
+
+    ```bash
+    # Pull the image from Docker Hub
+    docker pull praffulpanwar2016/task-app-ci-cd-demo:latest
+
+    # Start all services
+    docker-compose up -d
+    ```
+
+3.  **Access the application**:
+    - **Frontend**: [http://localhost:8080](http://localhost:8080)
+    - **API**: [http://localhost:8080/api/tasks](http://localhost:8080/api/tasks)
+
+4.  **Verify it's working**:
+
+    ```bash
+    # Test API
+    curl http://localhost:8080/api/tasks
+
+    # View logs
+    docker-compose logs app
+    docker-compose logs web
+    docker-compose logs db
+    ```
+
+5.  **Stop the application**:
+
+    ```bash
+    docker-compose down
+    ```
+
+### Image Details
+
+- **Base Image**: PHP 8.4 FPM
+- **Includes**: 
+  - Laravel 12 framework
+  - Vue 3 frontend
+  - All dependencies pre-installed
+  - Playwright browsers for testing
+  - Database migrations & seeders run automatically
+  
+- **Database**: Automatically migrated and seeded on startup
+- **Frontend Assets**: Pre-built and optimized
+
+### Troubleshooting Docker Hub Image
+
+**Port already in use?**
+```bash
+docker-compose down
+# Change port in docker-compose.yml
+# Then run again
+docker-compose up -d
+```
+
+**Want to rebuild locally instead?**
+```bash
+# Use the local docker-compose.yml from the repo
+git clone https://github.com/prafful-panwar/task-app-ci-cd-demo.git
+cd task-app-ci-cd-demo
+docker-compose up -d --build
+```
+
+**Clear Docker resources?**
+```bash
+docker-compose down -v  # -v removes volumes too
+docker system prune -a
+```
+
+
 
 ### Running Tests
 
