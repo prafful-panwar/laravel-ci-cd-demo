@@ -2,7 +2,13 @@
 
 A full-stack task management application built with Laravel 12 and Vue 3. Includes REST API, real-time task management, Docker support, and comprehensive testing.
 
-## Setup
+## Getting Started
+
+You can run this application in **3 distinct ways**, depending on your needs.
+
+### Option 1: Standard Local Setup (Clone & Install)
+
+_Best for: Code contributors, full control, standard development._
 
 1.  **Clone & Install**
 
@@ -15,11 +21,10 @@ A full-stack task management application built with Laravel 12 and Vue 3. Includ
     npm install && npm run build
     ```
 
-2.  **Configuration**
-    Update your `.env` file to match your environment:
+2.  **Configure Database**
+    Update `.env` with your local database credentials:
 
     ```ini
-    APP_NAME="App Name"
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
@@ -28,63 +33,52 @@ A full-stack task management application built with Laravel 12 and Vue 3. Includ
     DB_PASSWORD=
     ```
 
-3.  **Database & Seeding**
-    Run migrations and (optionally) seed the database:
-
+3.  **Run Migrations & Server**
     ```bash
-    php artisan migrate
-    php artisan db:seed
-    ```
-
-4.  **Start Server (Local)**
-
-    **Important:** Port `8000` is reserved for Docker. To avoid conflicts (or if you want to run both), always run the local server on a different port (e.g., 8001).
-
-    ```bash
+    php artisan migrate --seed
     php artisan serve --port=8001
     ```
+    Access at: `http://127.0.0.1:8001/api/tasks`
 
-    The API will be available at: `http://127.0.0.1:8001/api/tasks` (and other endpoints)
+---
 
-    _(Or if using Laravel Herd: `http://task-app-ci-cd.test/api/tasks`)_
+### Option 2: Local Docker Environment (Clone & Build)
 
-## Docker Setup (Recommended)
+_Best for: Developers who want an isolated containerized environment matching production._
 
-You can run the entire application (Frontend + Backend + Database) using Docker.
-
-1.  **Prerequisites**
-    - Ensure [Docker Desktop](https://www.docker.com/products/docker-desktop/) is installed and running.
-
-2.  **Start Application**
+1.  **Clone Repo**
 
     ```bash
+    git clone https://github.com/prafful-panwar/task-app-ci-cd-demo.git
+    cd task-app-ci-cd-demo
+    ```
+
+2.  **Start Containers**
+
+    ```bash
+    # Copies .env.example to .env automatically if missing
+    cp -n .env.example .env
     docker-compose up -d --build
     ```
 
-3.  **Access Application**
-    - **Frontend**: [http://localhost:8000](http://localhost:8000)
-    - **API**: [http://localhost:8000/api/tasks](http://localhost:8000/api/tasks)
+3.  **Access App**
+    - Frontend: [http://localhost:8000](http://localhost:8000)
+    - API: [http://localhost:8000/api/tasks](http://localhost:8000/api/tasks)
 
-4.  **Verify Frontend (Optional)**
+---
 
-    Run the browser tests to verify the frontend loads correctly:
+### Option 3: Pre-Built Production Image (Fastest)
 
-    ```bash
-    docker-compose exec app php artisan test tests/Browser/LandingPageTest.php
-    ```
+_Best for: Deployment, demos, or testing without building code._
 
-    This verifies the page loads without JavaScript errors and displays the app correctly.
+1.  **Using the Docker Hub Deployment Folder**
+    Refer to the **[docker-hub-deployment](./docker-hub-deployment)** directory in this repository.
 
-5.  **Stop Application**
-    ```bash
-    docker-compose down
-    ```
-
-## Using Docker Hub Pre-Built Image
-
-For instructions on how to use the pre-built images from Docker Hub, please refer to the [docker-hub-deployment](./docker-hub-deployment) directory.
-
-It contains a ready-to-use `docker-compose.yml` and configuration instructions for running the application without cloning the entire repository.
+2.  **Quick Instructions**
+    - Switch to that folder: `cd docker-hub-deployment`
+    - Copy config: `cp .env.example .env`
+    - Run: `docker-compose up -d`
+    - Access at: [http://localhost:8100](http://localhost:8100)
 
 ## Development & Quality Assurance
 
