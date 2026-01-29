@@ -12,7 +12,7 @@ services:
         volumes:
             - ./:/var/www
             - /var/www/vendor
-            - /var/www/public/build
+            - builddata:/var/www/public/build
         depends_on:
             - db
         environment:
@@ -34,6 +34,7 @@ services:
         volumes:
             - ./:/var/www
             - ./docker/nginx/conf.d:/etc/nginx/conf.d
+            - builddata:/var/www/public/build
         depends_on:
             - app
         networks:
@@ -61,3 +62,4 @@ networks:
 
 volumes:
     dbdata:
+    builddata:
