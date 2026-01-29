@@ -66,14 +66,15 @@ _Best for: Developers who want an isolated containerized environment matching pr
 
 2.  **Start Containers**
 
-    # Copies .env.example to .env automatically if missing
-
+    ```bash
+    # 1. Copy Environment File
     cp -n .env.example .env
-    php artisan key:generate
+
+    # 2. Start and Build Containers
     docker-compose up -d --build
 
-    ```
-
+    # 3. Generate Application Key (Run inside container)
+    docker-compose exec app php artisan key:generate
     ```
 
 3.  **Access App**
