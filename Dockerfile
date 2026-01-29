@@ -47,9 +47,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN npm install && npm run build
 
-# Install Playwright browsers for testing
-RUN npx playwright install chromium --with-deps
-
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
