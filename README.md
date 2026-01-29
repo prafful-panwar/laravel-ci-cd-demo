@@ -80,17 +80,88 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
     docker-compose down
     ```
 
-## Using Docker Hub Pre-Built Image
+## Quick Start with Docker Hub
 
-Want to skip the build step? Use the pre-built image instead:
+If you want to run this application without cloning the repository, you can use the pre-built images from Docker Hub.
 
-```bash
-docker-compose -f docker-compose.hub.yml up -d
+### 1. Create Configuration Files
+
+Create a new directory (e.g., `task-app`) and creates a `.env` file inside it:
+
+```ini
+APP_HOST=localhost
+APP_PORT=8100
 ```
 
-Access at [http://localhost:8001](http://localhost:8001)
+### 2. Create Docker Compose File
 
-The `docker-compose.hub.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub and runs on port `8001` to avoid conflicts with the local build (port `8000`).
+Create a `docker-compose.yml` file in the same directory:
+
+```yaml
+version: '3.8'
+
+services:
+    app:
+        image: praffulpanwar2016/task-app-ci-cd-demo:latest
+        platform: linux/amd64
+        restart: unless-stopped
+        working_dir: /var/www
+        depends_on:
+            - db
+        environment:
+            APP_URL: http://${APP_HOST}:${APP_PORT}
+            CORS_ALLOWED_ORIGINS: http://${APP_HOST}:${APP_PORT}
+            SANCTUM_STATEFUL_DOMAINS: ${APP_HOST}:${APP_PORT}
+            APP_KEY: base64:2fl+Ktvkfl+Frkxvry1vF+I5/1G5Q/5K5+555555555=
+            APP_DEBUG: true
+            DB_CONNECTION: mysql
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: task-app-ci-cd-demo
+            DB_USERNAME: laravel
+            DB_PASSWORD: password
+        networks:
+            - task-app-network
+
+    web:
+        image: praffulpanwar2016/task-app-nginx:latest
+        platform: linux/amd64
+        restart: unless-stopped
+        ports:
+            - '${APP_PORT}:80'
+        depends_on:
+            - app
+        networks:
+            - task-app-network
+
+    db:
+        image: mysql:8.0
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: task-app-ci-cd-demo
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - task-app-network
+
+networks:
+    task-app-network:
+        driver: bridge
+
+volumes:
+    dbdata:
+```
+
+### 3. Run the Application
+
+```bash
+docker-compose up -d
+```
+
+The application will be available at `http://localhost:8100` (or whatever host/port you configured in `.env`).
 
 ## Development & Quality Assurance
 
