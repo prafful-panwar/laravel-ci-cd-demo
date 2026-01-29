@@ -82,15 +82,9 @@ You can run the entire application (Frontend + Backend + Database) using Docker.
 
 ## Using Docker Hub Pre-Built Image
 
-Want to skip the build step? Use the pre-built image instead:
+For instructions on how to use the pre-built images from Docker Hub, please refer to the [docker-hub-deployment](./docker-hub-deployment) directory.
 
-```bash
-docker-compose -f docker-compose.hub.yml up -d
-```
-
-Access at [http://localhost:8001](http://localhost:8001)
-
-The `docker-compose.hub.yml` is pre-configured to use `praffulpanwar2016/task-app-ci-cd-demo:latest` from Docker Hub and runs on port `8001` to avoid conflicts with the local build (port `8000`).
+It contains a ready-to-use `docker-compose.yml` and configuration instructions for running the application without cloning the entire repository.
 
 ## Development & Quality Assurance
 
