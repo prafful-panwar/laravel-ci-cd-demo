@@ -1,3 +1,6 @@
-FROM nginx:alpine
+# Get the public assets from the app image
+FROM praffulpanwar2016/task-app-ci-cd-demo:latest AS app
 
+FROM nginx:alpine
 COPY docker/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=app /var/www/public /var/www/public
