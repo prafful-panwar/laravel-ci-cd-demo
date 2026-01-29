@@ -9,7 +9,7 @@ This project provides pre-built Docker images that allow you to run the applicat
 
 ## Setup Instructions
 
-To run the application, you need to create two files: `env` and `docker-compose.yml`.
+To run the application, you need to create two files: `.env` and `docker-compose.yml`.
 
 ### 1. Create a `.env` file
 
