@@ -38,20 +38,8 @@ jobs:
               run: |
                   npm install
                   npm run build
-            - name: Run Tests (Pest)
+            - name: Run Shield (QA Suite)
               env:
                   DB_CONNECTION: sqlite
                   DB_DATABASE: database/database.sqlite
-              run: php artisan test
-
-            - name: Run Static Analysis (Larastan)
-              run: ./vendor/bin/phpstan analyse --memory-limit=2G
-
-            - name: Run Pest Type Coverage
-              run: php -d memory_limit=2G ./vendor/bin/pest --type-coverage
-
-            - name: Run Code Style Check (Pint)
-              run: ./vendor/bin/pint --test
-
-            - name: Run Frontend Linting (ESLint)
-              run: npm run lint
+              run: composer run code-shield

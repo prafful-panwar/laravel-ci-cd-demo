@@ -1,5 +1,1 @@
-./vendor/bin/pint --test
-./vendor/bin/phpstan analyse --memory-limit=2G
-./vendor/bin/pest
-php -d memory_limit=2G ./vendor/bin/pest --type-coverage
-npm run lint
+composer run code-shield

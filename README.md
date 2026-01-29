@@ -6,7 +6,11 @@ A full-stack task management application built with Laravel 12 and Vue 3. Includ
 
 You can run this application in **3 distinct ways**, depending on your needs.
 
-### Option 1: Standard Local Setup (Clone & Install)
+<br>
+
+---
+
+## Option 1: Standard Local Setup (Clone & Install)
 
 _Best for: Code contributors, full control, standard development._
 
@@ -34,15 +38,22 @@ _Best for: Code contributors, full control, standard development._
     ```
 
 3.  **Run Migrations & Server**
+
     ```bash
     php artisan migrate --seed
     php artisan serve --port=8001
     ```
-    Access at: `http://127.0.0.1:8001/api/tasks`
+
+4.  **Access App**
+    - Frontend: [http://127.0.0.1:8001](http://127.0.0.1:8001)
+    - API: [http://127.0.0.1:8001/api/tasks](http://127.0.0.1:8001/api/tasks)
+
+<br>
+<br>
 
 ---
 
-### Option 2: Local Docker Environment (Clone & Build)
+## Option 2: Local Docker Environment (Clone & Build)
 
 _Best for: Developers who want an isolated containerized environment matching production._
 
@@ -65,9 +76,12 @@ _Best for: Developers who want an isolated containerized environment matching pr
     - Frontend: [http://localhost:8000](http://localhost:8000)
     - API: [http://localhost:8000/api/tasks](http://localhost:8000/api/tasks)
 
+<br>
+<br>
+
 ---
 
-### Option 3: Pre-Built Production Image (Fastest)
+## Option 3: Pre-Built Production Image (Fastest)
 
 _Best for: Deployment, demos, or testing without building code._
 
@@ -80,72 +94,45 @@ _Best for: Deployment, demos, or testing without building code._
     - Run: `docker-compose up -d`
     - Access at: [http://localhost:8100](http://localhost:8100)
 
+<br>
+<br>
+
+---
+
 ## Development & Quality Assurance
 
-### Running Tests
+### Run All Checks (Recommended)
 
-Run the complete test suite:
-
-```bash
-php artisan test
-```
-
-### Static Analysis (Larastan)
-
-Run PHPStan for static analysis:
+Run the full quality assurance suite with a single command:
 
 ```bash
-./vendor/bin/phpstan analyse --memory-limit=2G
+composer run code-shield
 ```
 
-### Code Formatting (Pint)
+This runs the following checks in order:
 
-Fix code style issues automatically:
+1.  **Pint** (Fixes code style)
+    `./vendor/bin/pint --test`
 
-```bash
-./vendor/bin/pint --parallel
-```
+2.  **PHPStan** (Static Analysis)
+    `./vendor/bin/phpstan analyse --memory-limit=2G`
 
-### Profanity Check
+3.  **Pest** (Unit/Feature Tests)
+    `./vendor/bin/pest`
 
-Check for profanity in the codebase:
+4.  **Type Coverage** (Enforces 100%)
+    `php -d memory_limit=2G ./vendor/bin/pest --type-coverage`
 
-```bash
-./vendor/bin/pest --profanity
-```
-
-### Type Coverage
-
-Check type coverage (enforces 100%):
-
-```bash
-php -d memory_limit=2G ./vendor/bin/pest --type-coverage
-```
-
-### IDE Helper
-
-Generate helper files for IDE autocompletion:
-
-```bash
-php artisan ide-helper:generate
-php artisan ide-helper:meta
-php artisan ide-helper:models --nowrite
-```
-
-### Frontend Linting
-
-Lint and fix frontend code (Vue/JS):
-
-```bash
-npm run lint
-```
+5.  **ESLint** (Frontend Linting)
+    `npm run lint`
 
 ### Git Hooks (Husky)
 
-Commands run automatically before commit:
+The `pre-commit` hook automatically runs the same shield command before every commit to ensure consistency.
 
-- `Pint` (Formats PHP code)
-- `Pest` (Runs tests)
+```bash
+composer run code-shield
+```
 
 ## API Documentation
 
@@ -292,7 +279,7 @@ Commands run automatically before commit:
         "due_date_human": "January 25, 2024",
         "created_at": "2024-01-10T08:00:00.000000Z",
         "created_at_human": "1 week ago",
-        "updated_at": "2024-01-21T10:05:00.000000Z"
+        "updated_at": "2024-01-10T08:00:00.000000Z"
     }
 }
 ```
