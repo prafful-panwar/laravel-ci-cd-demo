@@ -80,12 +80,6 @@ const emit = defineEmits(['delete', 'update-status']);
                             </button>
                         </td>
                     </tr>
-                    <!-- Spacer rows -->
-                    <template v-if="tasks.length < perPage">
-                        <tr v-for="i in perPage - tasks.length" :key="'empty-' + i" class="h-24">
-                            <td colspan="4" class="border p-2"></td>
-                        </tr>
-                    </template>
                 </tbody>
             </table>
         </div>
