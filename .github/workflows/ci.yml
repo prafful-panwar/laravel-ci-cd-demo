@@ -1,10 +1,10 @@
-name: Docker Image CI
+name: CI - Build and Push Docker Images
 
 on:
-    push:
-        branches: ['main']
-    pull_request:
-        branches: ['main']
+    workflow_run:
+        workflows: ['CI - Laravel Tests']
+        types:
+            - completed
 
 jobs:
     build:
