@@ -3,9 +3,9 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: ${APP_IMAGE:-task-app-ci-cd-demo}
-        container_name: ${COMPOSE_PROJECT_NAME:-task-app}-app
-        restart: ${RESTART_POLICY:-unless-stopped}
+        image: task-app-ci-cd-demo
+        container_name: task-app-ci-cd-demo-app
+        restart: unless-stopped
         working_dir: /var/www
         volumes:
             - ./:/var/www
@@ -14,25 +14,21 @@ services:
         depends_on:
             - db
         environment:
-            DB_CONNECTION: ${DB_CONNECTION:-mysql}
-            DB_HOST: ${DB_HOST:-db}
-            DB_PORT: ${DB_PORT:-3306}
-            DB_DATABASE: ${DB_DATABASE:-task_app_ci_cd}
-            DB_USERNAME: ${DB_USERNAME:-laravel}
-            DB_PASSWORD: ${DB_PASSWORD:-password}
-            APP_ENV: ${APP_ENV:-local}
-            APP_DEBUG: ${APP_DEBUG:-true}
-            APP_URL: ${APP_URL:-http://localhost:8000}
-            APP_KEY: ${APP_KEY}
+            DB_CONNECTION: mysql
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: task-app-ci-cd-demo
+            DB_USERNAME: laravel
+            DB_PASSWORD: password
         networks:
-            - app-network
+            - task-app-ci-cd-demo-network
 
     web:
-        image: ${NGINX_IMAGE:-nginx:alpine}
-        container_name: ${COMPOSE_PROJECT_NAME:-task-app}-web
-        restart: ${RESTART_POLICY:-unless-stopped}
+        image: nginx:alpine
+        container_name: task-app-ci-cd-demo-web
+        restart: unless-stopped
         ports:
-            - '${WEB_PORT:-8000}:80'
+            - '8000:80'
         volumes:
             - ./:/var/www
             - ./docker/nginx/conf.d:/etc/nginx/conf.d
@@ -40,26 +36,26 @@ services:
         depends_on:
             - app
         networks:
-            - app-network
+            - task-app-ci-cd-demo-network
 
     db:
-        image: ${DB_IMAGE:-mysql:8.0}
-        container_name: ${COMPOSE_PROJECT_NAME:-task-app}-db
-        restart: ${RESTART_POLICY:-unless-stopped}
+        image: mysql:8.0
+        container_name: task-app-ci-cd-demo-db
+        restart: unless-stopped
         ports:
-            - '${DB_EXTERNAL_PORT:-3307}:3306'
+            - '3307:3306'
         environment:
-            MYSQL_DATABASE: ${DB_DATABASE:-task_app_ci_cd}
-            MYSQL_USER: ${DB_USERNAME:-laravel}
-            MYSQL_PASSWORD: ${DB_PASSWORD:-password}
-            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+            MYSQL_DATABASE: task-app-ci-cd-demo
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: root
         volumes:
             - dbdata:/var/lib/mysql
         networks:
-            - app-network
+            - task-app-ci-cd-demo-network
 
 networks:
-    app-network:
+    task-app-ci-cd-demo-network:
         driver: bridge
 
 volumes:
