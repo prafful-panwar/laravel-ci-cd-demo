@@ -29,6 +29,6 @@
     "vue": "^3.5.27"
   },
   "dependencies": {
-    "playwright": "^1.57.0"
+    "playwright": "^1.58.0"
   }
 }
