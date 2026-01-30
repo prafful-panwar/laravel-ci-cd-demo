@@ -13,6 +13,13 @@ const handleClick = (link) => {
         emit('change-page', link);
     }
 };
+
+// Decode any HTML entities coming from backend labels (e.g. &laquo;, &raquo;)
+const decodeLabel = (label) => {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = label ?? '';
+    return txt.value;
+};
 </script>
 
 <template>
@@ -28,7 +35,7 @@ const handleClick = (link) => {
             :disabled="!link.url"
             @click="handleClick(link)"
         >
-            {{ link.label.replace('&laquo;', '«').replace('&raquo;', '»') }}
+            {{ decodeLabel(link.label) }}
         </button>
     </div>
 </template>
