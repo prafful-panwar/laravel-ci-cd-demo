@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     app:
         image: praffulpanwar2016/task-app-ci-cd-demo:latest
