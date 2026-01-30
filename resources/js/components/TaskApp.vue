@@ -161,7 +161,7 @@ onMounted(() => {
 
 <template>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white shadow-lg rounded-lg mt-6">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">Task Manager</h1>
+        <h1 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">Task Manager - CI/CD</h1>
 
         <!-- Notifications -->
         <NotificationBanner :message="successMessage" type="success" @close="successMessage = ''" />
