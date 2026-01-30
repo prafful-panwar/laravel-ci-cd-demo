@@ -1,6 +1,6 @@
 services:
     app:
-        image: praffulpanwar2016/task-app-ci-cd-demo:latest
+        image: ${APP_IMAGE:-praffulpanwar2016/task-app-ci-cd-demo:latest}
         platform: linux/amd64
         container_name: task-app-ci-cd-demo-app-hub
         restart: unless-stopped
@@ -23,7 +23,7 @@ services:
             - task-app-ci-cd-demo-network-hub
 
     web:
-        image: praffulpanwar2016/task-app-nginx:latest
+        image: ${NGINX_IMAGE:-praffulpanwar2016/task-app-nginx:latest}
         platform: linux/amd64
         container_name: task-app-ci-cd-demo-web-hub
         restart: unless-stopped
@@ -56,3 +56,5 @@ networks:
 
 volumes:
     dbdata-hub:
+        external: true
+        name: ${DB_VOLUME_NAME:-task-app-dbdata}

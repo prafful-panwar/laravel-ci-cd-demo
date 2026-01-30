@@ -9,12 +9,32 @@ on:
 jobs:
     laravel-tests:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+            cancel-in-progress: true
 
         steps:
             - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
               with:
                   php-version: '8.4'
             - uses: actions/checkout@v4
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'npm'
+                  cache-dependency-path: 'package-lock.json'
+            - name: Cache Composer files
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.composer/cache/files
+                      vendor
+                  key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      composer-${{ runner.os }}-
             - name: Copy .env
               run: php -r "file_exists('.env') || copy('.env.example', '.env');"
             - name: Install Dependencies

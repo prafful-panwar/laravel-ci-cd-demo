@@ -9,14 +9,42 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        permissions:
+            contents: read
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+            cancel-in-progress: true
+        environment: production
 
         steps:
             - name: Deploy to EC2 via SSH
               uses: appleboy/ssh-action@v1.0.3
+              env:
+                  APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
+                  NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.sha }}
+                  DB_VOLUME_NAME: task-app-dbdata
+                  COMPOSE_PROJECT_NAME: task-app
               with:
                   host: ${{ secrets.EC2_HOST }}
                   username: ${{ secrets.EC2_USER }}
                   key: ${{ secrets.EC2_SSH_KEY }}
+                  envs: APP_IMAGE,NGINX_IMAGE,DB_VOLUME_NAME,COMPOSE_PROJECT_NAME
                   script: |
                       cd /home/ubuntu/deploy/task-app
-                      ./deploy.sh
+                      echo "Ensuring stable Compose project name..."
+                      export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+                      echo "Ensuring external DB volume exists: ${DB_VOLUME_NAME}"
+                      docker volume create ${DB_VOLUME_NAME} >/dev/null 2>&1 || true
+                      echo "Writing deploy image tags to .env (for Compose substitution)"
+                      grep -q '^APP_IMAGE=' .env && sed -i "s|^APP_IMAGE=.*|APP_IMAGE=${APP_IMAGE}|" .env || echo "APP_IMAGE=${APP_IMAGE}" >> .env
+                      grep -q '^NGINX_IMAGE=' .env && sed -i "s|^NGINX_IMAGE=.*|NGINX_IMAGE=${NGINX_IMAGE}|" .env || echo "NGINX_IMAGE=${NGINX_IMAGE}" >> .env
+                      grep -q '^DB_VOLUME_NAME=' .env && sed -i "s|^DB_VOLUME_NAME=.*|DB_VOLUME_NAME=${DB_VOLUME_NAME}|" .env || echo "DB_VOLUME_NAME=${DB_VOLUME_NAME}" >> .env
+                      echo "Pulling latest Docker images..."
+                      docker compose pull
+                      echo "Restarting containers..."
+                      docker compose up -d
+                      echo "Running database migrations..."
+                      docker compose exec -T app php artisan migrate --force
+                      echo "Cleaning unused images..."
+                      docker image prune -f

@@ -53,4 +53,4 @@ RUN chown -R www-data:www-data /var/www \
 # Expose port 9000
 EXPOSE 9000
 
-CMD ["sh", "-c", "sleep 10 && php artisan migrate --force && php artisan db:seed --force && php-fpm"]
+CMD ["php-fpm"]
