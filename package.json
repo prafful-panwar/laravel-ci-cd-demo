@@ -10,7 +10,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.3.1",
+    "@commitlint/cli": "^20.4.0",
     "@commitlint/config-conventional": "^20.3.1",
     "@tailwindcss/vite": "^4.0.0",
     "@vitejs/plugin-vue": "^6.0.3",
