@@ -54,7 +54,20 @@ jobs:
                                                 echo "Attempt $i/60: DB not ready yet..."
                                                 sleep 3
                                             done
-                                            echo "Running database migrations..."
-                                            docker compose exec -T app php artisan migrate --force
+                                            echo "Giving DB a moment to accept remote connections..."
+                                            sleep 8
+                                            echo "Running database migrations (with retries)..."
+                                            set +e
+                                            MIGRATE_OK=0
+                                            for i in {1..10}; do
+                                                docker compose exec -T app php artisan migrate --force && MIGRATE_OK=1 && break
+                                                echo "Migrate failed (attempt $i/10). Retrying in 5s..."
+                                                sleep 5
+                                            done
+                                            set -e
+                                            if [ "$MIGRATE_OK" -ne 1 ]; then
+                                                echo "Migrations failed after retries." >&2
+                                                exit 1
+                                            fi
                       echo "Cleaning unused images..."
                       docker image prune -f
