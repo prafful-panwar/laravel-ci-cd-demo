@@ -44,7 +44,17 @@ jobs:
                       docker compose pull
                       echo "Restarting containers..."
                       docker compose up -d
-                      echo "Running database migrations..."
-                      docker compose exec -T app php artisan migrate --force
+                                            echo "Waiting for database to become ready..."
+                                            # Wait for MySQL to accept connections in the db service
+                                            for i in {1..60}; do
+                                                if docker compose exec -T db mysqladmin ping -uroot -proot --silent; then
+                                                    echo "Database is ready."
+                                                    break
+                                                fi
+                                                echo "Attempt $i/60: DB not ready yet..."
+                                                sleep 3
+                                            done
+                                            echo "Running database migrations..."
+                                            docker compose exec -T app php artisan migrate --force
                       echo "Cleaning unused images..."
                       docker image prune -f
