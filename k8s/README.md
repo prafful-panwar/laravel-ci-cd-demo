@@ -10,60 +10,14 @@ This directory contains Kubernetes manifests for deploying the Task App with **z
 - `deployment.yaml` - App deployment with rolling update strategy
 - `service.yaml` - LoadBalancer to expose the app
 
-## Quick Start (Local Testing with minikube)
+## Deployment Guide
 
-### 1. Install minikube and kubectl
+### Important: IAM Access Warning ⚠️
 
-```bash
-# Mac
-brew install minikube kubectl
+**The IAM User who creates the cluster is automatically the ONLY Admin.**
 
-# Start minikube
-minikube start
-
-# Verify
-kubectl cluster-info
-```
-
-### 2. Deploy Application
-
-```bash
-# Apply all manifests
-kubectl apply -f k8s/
-
-# Watch deployment
-kubectl get pods -n task-app --watch
-
-# Get service URL
-minikube service task-app-service -n task-app
-```
-
-### 3. Test Zero-Downtime Update
-
-```bash
-# Update to new image
-kubectl set image deployment/task-app \
-  app=praffulpanwar2016/task-app-ci-cd-demo:new-tag \
-  -n task-app
-
-# Watch rolling update (zero downtime!)
-kubectl rollout status deployment/task-app -n task-app
-
-# Verify pods (old pods gracefully replaced)
-kubectl get pods -n task-app
-```
-
-### 4. Rollback if Needed
-
-```bash
-# Rollback to previous version
-kubectl rollout undo deployment/task-app -n task-app
-
-# Check rollout history
-kubectl rollout history deployment/task-app -n task-app
-```
-
-## Deploy to AWS EKS
+- If you run `eksctl create` with your personal AWS Key, you MUST use those **SAME credentials** in GitHub Secrets (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`).
+- If you use different credentials for GitHub Actions, the pipeline will fail with "Unauthorized".
 
 ### Prerequisites
 
@@ -71,47 +25,63 @@ kubectl rollout history deployment/task-app -n task-app
 2. eksctl installed
 3. kubectl configured
 
-### 1. Create EKS Cluster
+### 1. Create EKS Cluster (Cost-Optimized)
+
+> **Note:** If you change the `--name` below, make sure to update it in all subsequent commands and GitHub Secrets.
 
 ```bash
 eksctl create cluster \
   --name task-app-cluster \
   --region us-east-1 \
-  --node-type t3.medium \
-  --nodes 2 \
-  --nodes-min 2 \
-  --nodes-max 4 \
+  --node-type t3.small \
+  --nodes 1 \
+  --with-oidc \
   --managed
 ```
 
-This takes ~15-20 minutes.
+**What this does:**
 
-### 2. Configure kubectl
+- **t3.small:** Cost-effective instance type.
+- **--with-oidc:** Enables IAM roles for Service Accounts (Required for storage).
+- **--managed:** Uses AWS Managed Node Groups for stability.
+
+### 1.1 Enable Storage (EBS CSI Driver) 💾
+
+**Critical Step:** Installing this addon allows your cluster to create Persistent Volumes (EBS) for the Database. Without this, MySQL will fail.
+
+```bash
+eksctl create addon \
+  --name aws-ebs-csi-driver \
+  --cluster task-app-cluster \
+  --region us-east-1 \
+  --force
+```
+
+_(Replace `task-app-cluster` with your actual cluster name if different)._
+
+This setup takes ~15-20 minutes total.
+
+### 2. Configure Local Access (Optional) 🖥️
+
+Run this if you want to run `kubectl` commands from your local computer (debugging, checking pods).
 
 ```bash
 aws eks update-kubeconfig --region us-east-1 --name task-app-cluster
 ```
 
-### 3. Deploy Application
+### 3. Deploy (Automated via GitHub Actions) 🚀
 
-```bash
-# Deploy all manifests
-kubectl apply -f k8s/
+You do **NOT** need to deploy manually.
 
-# Get LoadBalancer URL
-kubectl get service task-app-service -n task-app
-```
-
-### 4. Setup CI/CD
-
-The GitHub Actions workflow will automatically deploy to EKS when you push changes.
-
-Required GitHub Secrets:
-
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION` (e.g., us-east-1)
-- `EKS_CLUSTER_NAME` (e.g., task-app-cluster)
+1.  **Update Secrets:** Go to your GitHub Repo -> Settings -> Secrets and ensure `EKS_CLUSTER_NAME` matches your cluster name.
+2.  **Push Code:**
+    ```bash
+    git push
+    ```
+3.  **Done!** GitHub Actions will:
+    - Build Docker Images
+    - Run DB Migrations
+    - Deploy/Update the App (Zero-Downtime)
 
 ## Key Features
 
@@ -132,7 +102,7 @@ strategy:
 
 ### High Availability
 
-- **2 replicas** for zero-downtime during updates
+- **Rolling Updates** for zero-downtime during updates
 - **LoadBalancer** distributes traffic across healthy pods
 - **StatefulSet** for MySQL with persistent storage
 
@@ -155,37 +125,74 @@ kubectl scale deployment/task-app --replicas=3 -n task-app
 kubectl delete namespace task-app
 ```
 
-## Cost Estimate (AWS EKS)
+## Cost Estimate (AWS EKS - Optimized)
 
-- EKS Control Plane: $0.10/hour (~$73/month)
-- 2x t3.medium nodes: ~$60/month
-- Load Balancer: ~$20/month
-- **Total: ~$150/month**
+- **Node:** 1x t3.small (~$15/month)
+- **EKS Control Plane:** ~$73/month (Standard AWS EKS fee)
+- **Total:** ~$90/month (vs $150+ for medium/multi-node)
 
 ### Free Tier Option (minikube/k3s)
 
 For learning or testing, use minikube locally (free) or k3s on a single server.
 
-## Troubleshooting
+### 4. Need to Start Over? (Destroy Infrastructure) 🧨
 
-### Pods not starting
+To completely remove the cluster and stop all costs:
 
 ```bash
-# Check pod status
-kubectl describe pod <pod-name> -n task-app
+# 1. Delete the Cluster (Removes Nodes, volumes, load balancers)
+eksctl delete cluster --name task-app-cluster --region us-east-1
 
-# View logs
-kubectl logs <pod-name> -n task-app
+# 2. (Optional) Delete Images from Docker Hub
+# You might want to keep them, but if you want to save space:
+# Visit https://hub.docker.com/repositories and manually delete tags.
 ```
 
-### Database connection issues
+## Troubleshooting & Known Issues
+
+### 1. Persistent Volume Stuck in Pending (Unauthorized)
+
+If your DB pod stays `Pending` with an event saying `UnauthorizedOperation: ... ec2:CreateVolume`, it means the Node IAM Role needs permission.
+
+**Fix:**
 
 ```bash
-# Verify MySQL is running
-kubectl get pods -n task-app | grep mysql
+# Get your Node Role Name
+ROLE_NAME=$(aws iam list-roles --query "Roles[?contains(RoleName, 'NodeInstanceRole')].RoleName" --output text)
 
-# Check MySQL logs
-kubectl logs statefulset/mysql -n task-app
+# Attach the EBS Policy
+aws iam attach-role-policy \
+  --role-name $ROLE_NAME \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+
+# Force retry
+kubectl delete pod mysql-0 -n task-app
+```
+
+### 2. First Deployment Fails (Database Connection Refused)
+
+On the very first deployment, the application pods might crash (`500 Error`) because the `users` table doesn't exist yet, but the CI/CD pipeline runs migrations _after_ the app is healthy.
+
+**Fix (Manual Migration for 1st Deploys):**
+
+```bash
+# 1. Get the crashing pod name
+POD=$(kubectl get pods -n task-app -l app=task-app -o jsonpath='{.items[0].metadata.name}')
+
+# 2. Manually run migration
+kubectl exec -it $POD -n task-app -- php artisan migrate --force
+```
+
+Future deployments will work automatically since tables exist.
+
+### 3. Application Pods CrashLoopBackOff
+
+```bash
+# Check app logs
+kubectl logs -l app=task-app -n task-app -c app
+
+# Check Nginx logs
+kubectl logs -l app=task-app -n task-app -c nginx
 ```
 
 ### LoadBalancer pending

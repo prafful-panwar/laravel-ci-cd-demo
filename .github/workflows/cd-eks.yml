@@ -167,10 +167,30 @@ jobs:
                       kubectl wait --for=condition=Available deployment/task-app -n task-app --timeout=5m
                   else
                       echo "Namespace exists, performing rolling update..."
-                      # Update ConfigMap first (in case nginx config changed)
+                      # Update ConfigMap first
                       kubectl apply -f k8s/nginx-configmap.yaml
                       
-                      # Update deployment with new image (rolling update)
+                      # 1. Run Migration Job FIRST (Fixes first-deploy deadlock)
+                      echo "🚀 Running Database Migrations (Pre-Rollout)..."
+                      
+                      # Update image in migration job file
+                      sed -i "s|image: .*|image: ${APP_IMAGE}|" k8s/migration-job.yaml
+                      
+                      # Delete old job if exists
+                      kubectl delete job laravel-migration -n task-app --ignore-not-found
+                      
+                      # Trigger new migration job
+                      kubectl apply -f k8s/migration-job.yaml
+                      
+                      # Wait for migration to complete
+                      kubectl wait --for=condition=complete job/laravel-migration -n task-app --timeout=2m || {
+                          echo "❌ Migration failed! Checking logs..."
+                          kubectl logs job/laravel-migration -n task-app
+                          exit 1
+                      }
+                      echo "✅ Migrations completed successfully."
+
+                      # 2. Update Deployment (Rolling Update)
                       kubectl set image deployment/task-app \
                         app=${APP_IMAGE} \
                         nginx=${NGINX_IMAGE} \
@@ -184,11 +204,6 @@ jobs:
                   # Verify deployment
                   echo "Verifying deployment..."
                   kubectl get pods -n task-app
-
-                  # Run migrations
-                  echo "Running database migrations..."
-                  POD_NAME=$(kubectl get pods -n task-app -l app=task-app -o jsonpath='{.items[0].metadata.name}')
-                  kubectl exec -n task-app ${POD_NAME} -c app -- php artisan migrate --force
 
                   echo "Deployment completed successfully! ✅"
 
