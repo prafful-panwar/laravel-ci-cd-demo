@@ -112,6 +112,26 @@ _Best for: Deployment, demos, or testing without building code._
 
 ---
 
+## Option 4: Cloud Native / EKS (Production) ☁️
+
+_Best for: Zero-Downtime deployments, auto-scaling, and high availability._
+
+1.  **Infrastructure as Code:**
+    This project includes full Kubernetes manifests for AWS EKS deployment.
+
+2.  **Features:**
+    - **Zero-Downtime Rolling Updates**
+    - **Automated Database Migrations** (K8s Jobs)
+    - **Persistent Storage** (AWS EBS)
+    - **Cost Optimized** (Runs on t3.small)
+
+👉 **[View Full Kubernetes Guide](./k8s/README.md)**
+
+<br>
+<br>
+
+---
+
 ## Development & Quality Assurance
 
 ### Run All Checks (Recommended)

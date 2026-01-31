@@ -171,56 +171,10 @@ eksctl delete cluster --name task-app-cluster --region us-east-1
 # Visit https://hub.docker.com/repositories and manually delete tags.
 ```
 
-## Troubleshooting & Known Issues
+## Troubleshooting
 
-### 1. Persistent Volume Stuck in Pending (Unauthorized)
+The CI/CD pipeline is designed to be self-healing. However, if you encounter issues:
 
-If your DB pod stays `Pending` with an event saying `UnauthorizedOperation: ... ec2:CreateVolume`, it means the Node IAM Role needs permission.
-
-**Fix:**
-
-```bash
-# Get your Node Role Name
-ROLE_NAME=$(aws iam list-roles --query "Roles[?contains(RoleName, 'NodeInstanceRole')].RoleName" --output text)
-
-# Attach the EBS Policy
-aws iam attach-role-policy \
-  --role-name $ROLE_NAME \
-  --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-
-# Force retry
-kubectl delete pod mysql-0 -n task-app
-```
-
-### 2. First Deployment Fails (Database Connection Refused)
-
-On the very first deployment, the application pods might crash (`500 Error`) because the `users` table doesn't exist yet, but the CI/CD pipeline runs migrations _after_ the app is healthy.
-
-**Fix (Manual Migration for 1st Deploys):**
-
-```bash
-# 1. Get the crashing pod name
-POD=$(kubectl get pods -n task-app -l app=task-app -o jsonpath='{.items[0].metadata.name}')
-
-# 2. Manually run migration
-kubectl exec -it $POD -n task-app -- php artisan migrate --force
-```
-
-Future deployments will work automatically since tables exist.
-
-### 3. Application Pods CrashLoopBackOff
-
-```bash
-# Check app logs
-kubectl logs -l app=task-app -n task-app -c app
-
-# Check Nginx logs
-kubectl logs -l app=task-app -n task-app -c nginx
-```
-
-### LoadBalancer pending
-
-```bash
-# For minikube, use minikube tunnel in a separate terminal
-minikube tunnel
-```
+- **Check Pod Status:** `kubectl get pods -n task-app`
+- **View Logs:** `kubectl logs -l app=task-app -n task-app`
+- **Reset Cluster:** See "Destroy Infrastructure" section above.
