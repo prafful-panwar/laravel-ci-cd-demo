@@ -9,4 +9,4 @@ spec:
     resources:
         requests:
             storage: 5Gi
-    storageClassName: standard # minikube default (use gp2 for AWS EKS)
+    storageClassName: gp2 # EKS default storage class
