@@ -76,7 +76,7 @@ jobs:
 
                   echo ""
                   echo "🔍 Testing kubectl access to cluster..."
-                  if ! kubectl auth can-i get pods -n task-app 2>/dev/null; then
+                  if ! kubectl auth can-i get pods -n kube-system 2>/dev/null; then
                       echo ""
                       echo "❌ ERROR: kubectl cannot access the EKS cluster!"
                       echo ""
