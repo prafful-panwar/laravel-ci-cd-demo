@@ -104,6 +104,22 @@ jobs:
 
                   echo "✅ kubectl access verified!"
 
+            - name: Install AWS EBS CSI Driver (if not exists)
+              run: |
+                  echo "🔍 Checking for AWS EBS CSI Driver..."
+
+                  if kubectl get deployment ebs-csi-controller -n kube-system &>/dev/null; then
+                      echo "✅ EBS CSI Driver already installed"
+                  else
+                      echo "📦 Installing AWS EBS CSI Driver..."
+                      kubectl apply -k "https://github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.28"
+                      
+                      echo "⏳ Waiting for CSI driver to be ready..."
+                      kubectl wait --for=condition=Available deployment/ebs-csi-controller -n kube-system --timeout=2m
+                      
+                      echo "✅ EBS CSI Driver installed successfully"
+                  fi
+
             - name: Deploy to EKS with Zero-Downtime Rolling Update
               env:
                   APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
