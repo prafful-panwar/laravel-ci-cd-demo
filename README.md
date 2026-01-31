@@ -119,7 +119,14 @@ _Best for: Zero-Downtime deployments, auto-scaling, and high availability._
 1.  **Infrastructure as Code:**
     This project includes full Kubernetes manifests for AWS EKS deployment.
 
-2.  **Features:**
+2.  **Required Secrets:**
+    To enable the automated pipeline, configure these Repository Secrets:
+    - `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`
+    - `AWS_REGION` (e.g., `us-east-1`)
+    - `EKS_CLUSTER_NAME` (e.g., `task-app-cluster`)
+    - `DOCKER_USERNAME` & `DOCKER_PASSWORD`
+
+3.  **Features:**
     - **Zero-Downtime Rolling Updates**
     - **Automated Database Migrations** (K8s Jobs)
     - **Persistent Storage** (AWS EBS)

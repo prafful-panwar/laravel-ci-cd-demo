@@ -96,7 +96,18 @@ aws eks update-kubeconfig --region us-east-1 --name task-app-cluster
 
 You do **NOT** need to deploy manually.
 
-1.  **Update Secrets:** Go to your GitHub Repo -> Settings -> Secrets and ensure `EKS_CLUSTER_NAME` matches your cluster name.
+1.  **Configure GitHub Secrets:**
+    Go to `Settings` -> `Secrets and variables` -> `Actions` and add:
+
+    | Secret Name             | Description                    | Example Value      |
+    | :---------------------- | :----------------------------- | :----------------- |
+    | `AWS_ACCESS_KEY_ID`     | AWS User Access Key (Admin)    | `AKIA...`          |
+    | `AWS_SECRET_ACCESS_KEY` | AWS User Secret Key            | `wJalr...`         |
+    | `AWS_REGION`            | AWS Region where cluster lives | `us-east-1`        |
+    | `EKS_CLUSTER_NAME`      | Exact name of your EKS cluster | `task-app-cluster` |
+    | `DOCKER_USERNAME`       | Docker Hub Username            | `myusername`       |
+    | `DOCKER_PASSWORD`       | Docker Hub Access Token        | `dckr_pat_...`     |
+
 2.  **Push Code:**
     ```bash
     git push
