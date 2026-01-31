@@ -1,26 +1,24 @@
-# Task App (Laravel + Vue)
+# Cloud-Native Task App (Laravel 12 + Vue 3) 🚀
 
-A full-stack task management application built with Laravel 12 and Vue 3.
+**A Technical Proof-of-Concept for Docker, Kubernetes (EKS), and Zero-Downtime CI/CD Pipelines.**
 
 > [!NOTE]
-> **About Project:** This repository is a reference implementation for **DevOps Best Practices** using Docker & Kubernetes. It demonstrates how to build, test, and deploy a Laravel/Vue application with a fully automated CI/CD pipeline.
+> 🎯 **Project Scope:** This is a **Technical Demonstration** of a full CI/CD lifecycle using Docker and Kubernetes. It serves as a proof-of-concept for Zero-Downtime deployments, automated testing, and infrastructure management on minimal resources.
 >
 > 🐳 **Docker Hub Integration:** Kubernetes manifests are configured to pull pre-built, optimized images directly from [Docker Hub](https://hub.docker.com/), ensuring fast and consistent deployments.
 
 > [!TIP]
-> **Smart Scaling:** This project features a custom "Cost-Optimized" configuration that allows the entire stack to run smoothly on a minimal **t3.small (2GB RAM)** instance, saving costs without sacrificing performance.
+> ⚡ **Smart Scaling:** This project features a custom "Cost-Optimized" configuration that allows the entire stack to run smoothly on a minimal **t3.small (2GB RAM)** instance, saving costs without sacrificing performance.
 
-## Getting Started
-
-You can run this application in **3 distinct ways**, depending on your needs.
+## Getting Started (Development)
 
 <br>
 
 ---
 
-## Option 1: Standard Local Setup (Clone & Install)
+## Option 1: Standard Application (Local Code)
 
-_Best for: Code contributors, full control, standard development._
+_Best for: Code contributors. Runs directly on your machine using standard tools._
 
 1.  **Clone & Install**
 
@@ -57,13 +55,12 @@ _Best for: Code contributors, full control, standard development._
     - API: [http://127.0.0.1:8001/api/tasks](http://127.0.0.1:8001/api/tasks)
 
 <br>
-<br>
 
 ---
 
-## Option 2: Local Docker Environment (Clone & Build)
+## Option 2: Local Docker Build (Containerized)
 
-_Best for: Developers who want an isolated containerized environment matching production._
+_Best for: Developers needing isolation. Builds the application from your local code._
 
 1.  **Clone Repo**
 
@@ -90,57 +87,72 @@ _Best for: Developers who want an isolated containerized environment matching pr
     - API: [http://localhost:8000/api/tasks](http://localhost:8000/api/tasks)
 
 <br>
-<br>
 
 ---
 
-## Option 3: Pre-Built Production Image (Fastest)
+## Option 3: Manual Deployment (Pre-Built Images)
 
-_Best for: Deployment, demos, or testing without building code._
+_Best for: Running the pre-built Docker Hub image (works for both Local Testing & Manual Server Deployment)._
 
 1.  **Using the Docker Hub Deployment Folder**
     Refer to the **[docker-hub-deployment](./docker-hub-deployment)** directory in this repository.
 
-2.  **Quick Instructions**
-    - Switch to that folder: `cd docker-hub-deployment`
-    - Copy config: `cp .env.example .env`
-    - Run: `docker-compose up -d`
-    - Access at: [http://localhost:8100](http://localhost:8100)
+    👉 **[View Manual Deployment Guide](./docker-hub-deployment/README.md)**
 
 <br>
 <br>
 
 ---
 
-## Option 4: Cloud Native / EKS (Production) ☁️
+## Automated CI Pipeline (Testing & Build) 🧪
 
-_Best for: Zero-Downtime deployments, auto-scaling, and high availability._
+When you push code to GitHub (`git push`), the **CI Pipeline** runs automatically to ensure quality:
 
-1.  **Infrastructure as Code:**
-    This project includes full Kubernetes manifests for AWS EKS deployment.
+1.  **Code Quality:** Runs `Pint` (Style), `ESLint` (Frontend), and `PHPStan` (Static Analysis).
+2.  **Testing:** Runs `Pest` (Unit/Feature Tests) and checks **Type Coverage**.
+3.  **Build & Push:** Builds the production Docker Image from source and uploads it to Docker Hub (making it available for **Option 3** & **CD Pipelines**).
 
-2.  **Required Secrets:**
-    To enable the automated pipeline (Docker Build + EC2 or EKS Deployment), configure these Repository Secrets:
+---
 
-    | Secret Name             | Description             | Used In Workflow File(s)                           |
-    | :---------------------- | :---------------------- | :------------------------------------------------- |
-    | `DOCKER_USERNAME`       | Docker Hub Username     | `.github/workflows/ci.yml`, `cd.yml`, `cd-eks.yml` |
-    | `DOCKER_PASSWORD`       | Docker Hub Access Token | `.github/workflows/ci.yml`                         |
-    | `AWS_ACCESS_KEY_ID`     | AWS Admin Keys          | `.github/workflows/cd-eks.yml`                     |
-    | `AWS_SECRET_ACCESS_KEY` | AWS Admin Secret        | `.github/workflows/cd-eks.yml`                     |
-    | `AWS_REGION`            | Target Region           | `.github/workflows/cd-eks.yml`                     |
-    | `EKS_CLUSTER_NAME`      | EKS Cluster Name        | `.github/workflows/cd-eks.yml`                     |
-    | `EC2_HOST`              | VM IP Address           | `.github/workflows/cd.yml`                         |
-    | `EC2_USER`              | SSH Username            | `.github/workflows/cd.yml`                         |
-    | `EC2_SSH_KEY`           | SSH Private Key         | `.github/workflows/cd.yml`                         |
+## Automated CD Pipelines (Deployment) 🚀
 
-3.  **Features:**
-    - **Zero-Downtime Rolling Updates**
-    - **Automated Database Migrations** (K8s Jobs)
-    - **Persistent Storage** (AWS EBS)
-    - **Cost Optimized** (Runs on t3.small)
+Once the CI Pipeline passes and the image is on Docker Hub, you have **two choices** for deployment:
+
+### 🟢 Strategy A: Deployment to EC2 (Simple Docker)
+
+_Effectively "Option 3" running on a server._
+
+1.  **Pipeline:** `.github/workflows/cd.yml`
+2.  **Mechanism:** SSH into server -> Pulls Docker Hub Image -> Restarts Container.
+3.  **Result:** Simple, single-server deployment.
+
+👉 **[View Server Deployment Guide](./docker-hub-deployment/README.md)**
+
+### 🔵 Strategy B: Deployment to AWS EKS (Kubernetes)
+
+_Cloud-Native orchestration using the same Docker Hub image._
+
+1.  **Pipeline:** `.github/workflows/cd-eks.yml`
+2.  **Mechanism:** Updates Kubernetes Manifests -> Triggers Rolling Update.
+3.  **Result:** High Availability, Zero-Downtime, Auto-Scaling.
 
 👉 **[View Full Kubernetes Guide](./k8s/README.md)**
+
+### Required Secrets Configuration for CI/CD Pipelines
+
+To use either pipeline, go to **Settings > Secrets and variables > Actions** in your repository and add these **GitHub Secrets**:
+
+| Secret Name             | Description             | Used In Workflow File(s)         |
+| :---------------------- | :---------------------- | :------------------------------- |
+| `DOCKER_USERNAME`       | Docker Hub Username     | `ci.yml`, `cd.yml`, `cd-eks.yml` |
+| `DOCKER_PASSWORD`       | Docker Hub Access Token | `ci.yml`                         |
+| `AWS_ACCESS_KEY_ID`     | AWS Admin Keys          | `cd-eks.yml`                     |
+| `AWS_SECRET_ACCESS_KEY` | AWS Admin Secret        | `cd-eks.yml`                     |
+| `AWS_REGION`            | Target Region           | `cd-eks.yml`                     |
+| `EKS_CLUSTER_NAME`      | EKS Cluster Name        | `cd-eks.yml`                     |
+| `EC2_HOST`              | VM IP Address           | `cd.yml`                         |
+| `EC2_USER`              | SSH Username            | `cd.yml`                         |
+| `EC2_SSH_KEY`           | SSH Private Key         | `cd.yml`                         |
 
 <br>
 <br>
