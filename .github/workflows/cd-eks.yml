@@ -111,11 +111,25 @@ jobs:
               run: |
                   echo "Deploying new image: ${APP_IMAGE}"
 
-                  # Update deployment with new image (rolling update)
-                  kubectl set image deployment/task-app \
-                    app=${APP_IMAGE} \
-                    nginx=${NGINX_IMAGE} \
-                    -n task-app
+                  # Create namespace if it doesn't exist
+                  if ! kubectl get namespace task-app &>/dev/null; then
+                      echo "Creating namespace and initial resources..."
+                      kubectl apply -f k8s/namespace.yaml
+                      kubectl apply -f k8s/mysql-pvc.yaml
+                      kubectl apply -f k8s/mysql-statefulset.yaml
+                      kubectl apply -f k8s/deployment.yaml
+                      kubectl apply -f k8s/service.yaml
+                      
+                      echo "Waiting for initial deployment..."
+                      kubectl wait --for=condition=Available deployment/task-app -n task-app --timeout=5m
+                  else
+                      echo "Namespace exists, performing rolling update..."
+                      # Update deployment with new image (rolling update)
+                      kubectl set image deployment/task-app \
+                        app=${APP_IMAGE} \
+                        nginx=${NGINX_IMAGE} \
+                        -n task-app
+                  fi
 
                   # Wait for rollout to complete (zero-downtime)
                   echo "Waiting for zero-downtime rolling update..."
