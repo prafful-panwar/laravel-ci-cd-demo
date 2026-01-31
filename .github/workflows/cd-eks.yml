@@ -208,7 +208,11 @@ jobs:
                       }
                       echo "✅ Migrations completed successfully."
 
-                      # 2. Update Deployment (Rolling Update)
+                      # 3. Apply Manifests (Ensure Deployment exists) & Update Image
+                      echo "🔄 Applying manifests to ensure Deployment exists..."
+                      kubectl apply -f k8s/
+                      
+                      # 4. Update Image
                       kubectl set image deployment/task-app \
                         app=${APP_IMAGE} \
                         nginx=${NGINX_IMAGE} \
