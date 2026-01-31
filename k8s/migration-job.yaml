@@ -24,8 +24,8 @@ spec:
                       - name: DB_DATABASE
                         value: 'task-app-ci-cd-demo'
                       - name: DB_USERNAME
-                        value: 'root'
+                        value: 'laravel'
                       - name: DB_PASSWORD
-                        value: 'root'
+                        value: 'password'
             restartPolicy: OnFailure
     backoffLimit: 6
