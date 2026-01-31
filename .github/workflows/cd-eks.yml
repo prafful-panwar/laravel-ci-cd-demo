@@ -146,6 +146,18 @@ jobs:
                       echo "ℹ️  No running instances found for cluster"
                   fi
 
+            - name: Optimize Cluster Resources (t3.small)
+              run: |
+                  echo "🧹 Optimizing cluster for t3.small..."
+
+                  # Delete Metrics Server (Saves ~400MB)
+                  kubectl delete deployment metrics-server -n kube-system --ignore-not-found
+
+                  # Scale EBS CSI Driver to 1 (Saves ~240MB)
+                  kubectl scale deployment ebs-csi-controller --replicas=1 -n kube-system
+
+                  echo "✅ Cluster resources optimized for low-cost hardware."
+
             - name: Deploy to EKS with Zero-Downtime Rolling Update
               env:
                   APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
