@@ -120,16 +120,9 @@ _Best for: Zero-Downtime deployments, auto-scaling, and high availability._
     This project includes full Kubernetes manifests for AWS EKS deployment.
 
 2.  **Required Secrets:**
-    To enable the automated pipeline, configure these Repository Secrets:
-
-    | Secret Name             | Description                   | Used In Workflow               |
-    | :---------------------- | :---------------------------- | :----------------------------- |
-    | `AWS_ACCESS_KEY_ID`     | AWS Admin credentials for EKS | `.github/workflows/cd-eks.yml` |
-    | `AWS_SECRET_ACCESS_KEY` | AWS Admin Secret Key          | `.github/workflows/cd-eks.yml` |
-    | `AWS_REGION`            | Target AWS Region             | `.github/workflows/cd-eks.yml` |
-    | `EKS_CLUSTER_NAME`      | Name of your EKS Cluster      | `.github/workflows/cd-eks.yml` |
-    | `DOCKER_USERNAME`       | Docker Hub Username           | `.github/workflows/ci.yml`     |
-    | `DOCKER_PASSWORD`       | Docker Hub Access Token       | `.github/workflows/ci.yml`     |
+    To run the CI/CD pipeline, configure these Repository Secrets:
+    - `DOCKER_USERNAME` & `DOCKER_PASSWORD` (For Building Images)
+    - _For EKS Deployment Secrets (AWS keys), see the [Kubernetes Guide](./k8s/README.md)._
 
 3.  **Features:**
     - **Zero-Downtime Rolling Updates**
