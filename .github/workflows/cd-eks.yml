@@ -171,8 +171,10 @@ jobs:
                       kubectl delete job laravel-migration -n task-app --ignore-not-found
                       kubectl apply -f k8s/migration-job.yaml
                       kubectl wait --for=condition=complete job/laravel-migration -n task-app --timeout=5m || {
-                          echo "❌ Migration failed logs:"
-                          kubectl logs job/laravel-migration -n task-app
+                          echo "❌ Migration failed! Debug info:"
+                          kubectl describe job/laravel-migration -n task-app
+                          kubectl logs job/laravel-migration -n task-app || echo "No logs found"
+                          kubectl get pods -n task-app
                           exit 1
                       }
                       
