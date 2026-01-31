@@ -121,10 +121,15 @@ _Best for: Zero-Downtime deployments, auto-scaling, and high availability._
 
 2.  **Required Secrets:**
     To enable the automated pipeline, configure these Repository Secrets:
-    - `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`
-    - `AWS_REGION` (e.g., `us-east-1`)
-    - `EKS_CLUSTER_NAME` (e.g., `task-app-cluster`)
-    - `DOCKER_USERNAME` & `DOCKER_PASSWORD`
+
+    | Secret Name             | Description                   | Used In Workflow               |
+    | :---------------------- | :---------------------------- | :----------------------------- |
+    | `AWS_ACCESS_KEY_ID`     | AWS Admin credentials for EKS | `.github/workflows/cd-eks.yml` |
+    | `AWS_SECRET_ACCESS_KEY` | AWS Admin Secret Key          | `.github/workflows/cd-eks.yml` |
+    | `AWS_REGION`            | Target AWS Region             | `.github/workflows/cd-eks.yml` |
+    | `EKS_CLUSTER_NAME`      | Name of your EKS Cluster      | `.github/workflows/cd-eks.yml` |
+    | `DOCKER_USERNAME`       | Docker Hub Username           | `.github/workflows/ci.yml`     |
+    | `DOCKER_PASSWORD`       | Docker Hub Access Token       | `.github/workflows/ci.yml`     |
 
 3.  **Features:**
     - **Zero-Downtime Rolling Updates**
