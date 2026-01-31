@@ -1,6 +1,14 @@
 # Task App (Laravel + Vue)
 
-A full-stack task management application built with Laravel 12 and Vue 3. Includes REST API, real-time task management, Docker support, and comprehensive testing.
+A full-stack task management application built with Laravel 12 and Vue 3.
+
+> [!NOTE]
+> **About Project:** This repository is a reference implementation for **DevOps Best Practices** using Docker & Kubernetes. It demonstrates how to build, test, and deploy a Laravel/Vue application with a fully automated CI/CD pipeline.
+>
+> 🐳 **Docker Hub Integration:** Kubernetes manifests are configured to pull pre-built, optimized images directly from [Docker Hub](https://hub.docker.com/), ensuring fast and consistent deployments.
+
+> [!TIP]
+> **Smart Scaling:** This project features a custom "Cost-Optimized" configuration that allows the entire stack to run smoothly on a minimal **t3.small (2GB RAM)** instance, saving costs without sacrificing performance.
 
 ## Getting Started
 

@@ -10,6 +10,29 @@ This directory contains Kubernetes manifests for deploying the Task App with **z
 - `deployment.yaml` - App deployment with rolling update strategy
 - `service.yaml` - LoadBalancer to expose the app
 
+## 🐳 Image Source
+
+This deployment uses public images hosted on **Docker Hub**:
+
+- **App:** `praffulpanwar2016/task-app-ci-cd-demo`
+- **Nginx:** `praffulpanwar2016/task-app-nginx`
+
+> The CI/CD pipeline automatically builds new versions, pushes them to Docker Hub with a unique SHA tag, and updates the cluster.
+
+## Resource Optimization Strategy (Low-Tier Server) 📉
+
+This infrastructure is engineered to run a full production stack on a single **t3.small (2GB RAM)** node ($15/mo). Achieving "Zero-Downtime" on this minimal hardware required custom automated tuning:
+
+1.  **Automated Bloat Removal:** The pipeline detects `t3.small` nodes and automatically deletes the K8s `metrics-server` (saving 400MB RAM) and scales down system drivers.
+2.  **IP Address Management:** Forced `replicas: 1` to stay within the hardware limit of 3 Network Interfaces per node.
+3.  **Strict Memory Budget:**
+    - MySQL: 512MB
+    - App: 512MB
+    - System: 600MB
+    - Headroom: ~400MB (Prevents OOM Kills)
+
+> This proves that enterprise-grade Kubernetes architecture can be adapted for cost-effective implementation without sacrificing automation.
+
 ## Deployment Guide
 
 ### Important: IAM Access Warning ⚠️
