@@ -18,7 +18,7 @@ spec:
                       - name: DB_CONNECTION
                         value: 'mysql'
                       - name: DB_HOST
-                        value: 'mysql' # Service name in k8s
+                        value: 'db' # Service name in k8s
                       - name: DB_PORT
                         value: '3306'
                       - name: DB_DATABASE
