@@ -28,6 +28,32 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
+            - name: Validate AWS credentials and permissions
+              run: |
+                  echo "🔐 Validating AWS credentials..."
+
+                  # Test AWS connection
+                  if ! aws sts get-caller-identity; then
+                      echo "❌ Failed to authenticate with AWS. Check your credentials."
+                      exit 1
+                  fi
+
+                  echo "✅ AWS authentication successful"
+                  echo "Account: $(aws sts get-caller-identity --query Account --output text)"
+                  echo "User/Role: $(aws sts get-caller-identity --query Arn --output text)"
+
+                  # Test EKS permissions
+                  echo ""
+                  echo "🔍 Checking EKS permissions..."
+                  if ! aws eks describe-cluster --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }} &>/dev/null; then
+                      echo "⚠️  Warning: Cannot access EKS cluster. This could be due to:"
+                      echo "  - Cluster doesn't exist yet"
+                      echo "  - Insufficient IAM permissions"
+                      echo "  - Incorrect cluster name or region"
+                  else
+                      echo "✅ EKS access verified"
+                  fi
+
             - name: Check EKS cluster status
               id: cluster-check
               run: |
