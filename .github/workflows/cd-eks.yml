@@ -28,6 +28,20 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
+            - name: Check EKS cluster status
+              id: cluster-check
+              run: |
+                  CLUSTER_STATUS=$(aws eks describe-cluster --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }} --query 'cluster.status' --output text 2>/dev/null || echo "NOT_FOUND")
+                  echo "Cluster status: $CLUSTER_STATUS"
+
+                  if [ "$CLUSTER_STATUS" != "ACTIVE" ]; then
+                      echo "❌ EKS cluster is not ready (status: $CLUSTER_STATUS)"
+                      echo "Please wait for cluster creation to complete, then re-run this workflow."
+                      exit 1
+                  fi
+
+                  echo "✅ EKS cluster is ready"
+
             - name: Configure kubectl
               run: |
                   aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
