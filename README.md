@@ -120,9 +120,19 @@ _Best for: Zero-Downtime deployments, auto-scaling, and high availability._
     This project includes full Kubernetes manifests for AWS EKS deployment.
 
 2.  **Required Secrets:**
-    To run the CI/CD pipeline, configure these Repository Secrets:
-    - `DOCKER_USERNAME` & `DOCKER_PASSWORD` (For Building Images)
-    - _For EKS Deployment Secrets (AWS keys), see the [Kubernetes Guide](./k8s/README.md)._
+    To enable the automated pipeline (Docker Build + EC2 or EKS Deployment), configure these Repository Secrets:
+
+    | Secret Name             | Description             | Used In Workflow File(s)                           |
+    | :---------------------- | :---------------------- | :------------------------------------------------- |
+    | `DOCKER_USERNAME`       | Docker Hub Username     | `.github/workflows/ci.yml`, `cd.yml`, `cd-eks.yml` |
+    | `DOCKER_PASSWORD`       | Docker Hub Access Token | `.github/workflows/ci.yml`                         |
+    | `AWS_ACCESS_KEY_ID`     | AWS Admin Keys          | `.github/workflows/cd-eks.yml`                     |
+    | `AWS_SECRET_ACCESS_KEY` | AWS Admin Secret        | `.github/workflows/cd-eks.yml`                     |
+    | `AWS_REGION`            | Target Region           | `.github/workflows/cd-eks.yml`                     |
+    | `EKS_CLUSTER_NAME`      | EKS Cluster Name        | `.github/workflows/cd-eks.yml`                     |
+    | `EC2_HOST`              | VM IP Address           | `.github/workflows/cd.yml`                         |
+    | `EC2_USER`              | SSH Username            | `.github/workflows/cd.yml`                         |
+    | `EC2_SSH_KEY`           | SSH Private Key         | `.github/workflows/cd.yml`                         |
 
 3.  **Features:**
     - **Zero-Downtime Rolling Updates**
