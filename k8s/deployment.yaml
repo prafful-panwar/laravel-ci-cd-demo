@@ -4,12 +4,12 @@ metadata:
     name: task-app
     namespace: task-app
 spec:
-    replicas: 2 # Run 2 instances for zero-downtime
+    replicas: 1 # Reduced to 1 to fit within t3.small IP limits
     strategy:
         type: RollingUpdate
         rollingUpdate:
-            maxUnavailable: 0 # Always keep at least 1 pod running
-            maxSurge: 1 # Max 1 extra pod during update
+            maxUnavailable: 0 # Ensure we always have 1 running
+            maxSurge: 1 # Allow 1 extra pod during update to perform rollout
     selector:
         matchLabels:
             app: task-app
@@ -48,10 +48,10 @@ spec:
                         name: php-fpm
                   resources:
                       requests:
-                          memory: '128Mi'
+                          memory: '256Mi'
                           cpu: '100m'
                       limits:
-                          memory: '256Mi'
+                          memory: '512Mi'
                           cpu: '500m'
                   livenessProbe:
                       tcpSocket:
