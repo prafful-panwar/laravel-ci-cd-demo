@@ -47,23 +47,15 @@ spec:
                       - containerPort: 9000
                         name: php-fpm
                   livenessProbe:
-                      exec:
-                          command:
-                              - php
-                              - artisan
-                              - tinker
-                              - --execute=return 0;
+                      tcpSocket:
+                          port: 9000
                       initialDelaySeconds: 30
                       periodSeconds: 10
                       timeoutSeconds: 5
                       failureThreshold: 3
                   readinessProbe:
-                      exec:
-                          command:
-                              - php
-                              - artisan
-                              - tinker
-                              - --execute=return 0;
+                      tcpSocket:
+                          port: 9000
                       initialDelaySeconds: 10
                       periodSeconds: 5
                       timeoutSeconds: 5

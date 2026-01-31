@@ -221,7 +221,12 @@ jobs:
 
                   # Wait for rollout to complete (zero-downtime)
                   echo "Waiting for zero-downtime rolling update..."
-                  kubectl rollout status deployment/task-app -n task-app --timeout=5m
+                  kubectl rollout status deployment/task-app -n task-app --timeout=5m || {
+                      echo "❌ Deployment failed! Checking logs..."
+                      kubectl logs -l app=task-app -n task-app --all-containers=true --tail=50
+                      kubectl describe pod -l app=task-app -n task-app
+                      exit 1
+                  }
 
                   # Verify deployment
                   echo "Verifying deployment..."
