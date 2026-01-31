@@ -201,7 +201,7 @@ jobs:
                       kubectl apply -f k8s/migration-job.yaml
                       
                       # Wait for migration to complete
-                      kubectl wait --for=condition=complete job/laravel-migration -n task-app --timeout=2m || {
+                      kubectl wait --for=condition=complete job/laravel-migration -n task-app --timeout=5m || {
                           echo "❌ Migration failed! Checking logs..."
                           kubectl logs job/laravel-migration -n task-app
                           exit 1
