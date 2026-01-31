@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: task-app
+    namespace: task-app
+spec:
+    replicas: 2 # Run 2 instances for zero-downtime
+    strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxUnavailable: 0 # Always keep at least 1 pod running
+            maxSurge: 1 # Max 1 extra pod during update
+    selector:
+        matchLabels:
+            app: task-app
+    template:
+        metadata:
+            labels:
+                app: task-app
+        spec:
+            containers:
+                # Laravel App Container
+                - name: app
+                  image: praffulpanwar2016/task-app-ci-cd-demo:latest
+                  imagePullPolicy: Always
+                  workingDir: /var/www
+                  env:
+                      - name: APP_URL
+                        value: 'http://localhost'
+                      - name: APP_KEY
+                        value: 'base64:2fl+Ktvkfl+Frkxvry1vF+I5/1G5Q/5K5+555555555='
+                      - name: APP_DEBUG
+                        value: 'true'
+                      - name: DB_CONNECTION
+                        value: 'mysql'
+                      - name: DB_HOST
+                        value: 'db'
+                      - name: DB_PORT
+                        value: '3306'
+                      - name: DB_DATABASE
+                        value: 'task-app-ci-cd-demo'
+                      - name: DB_USERNAME
+                        value: 'laravel'
+                      - name: DB_PASSWORD
+                        value: 'password'
+                  ports:
+                      - containerPort: 9000
+                        name: php-fpm
+                  livenessProbe:
+                      exec:
+                          command:
+                              - php
+                              - artisan
+                              - tinker
+                              - --execute=return 0;
+                      initialDelaySeconds: 30
+                      periodSeconds: 10
+                      timeoutSeconds: 5
+                      failureThreshold: 3
+                  readinessProbe:
+                      exec:
+                          command:
+                              - php
+                              - artisan
+                              - tinker
+                              - --execute=return 0;
+                      initialDelaySeconds: 10
+                      periodSeconds: 5
+                      timeoutSeconds: 5
+                      failureThreshold: 3
+
+                # Nginx Container
+                - name: nginx
+                  image: praffulpanwar2016/task-app-nginx:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 80
+                        name: http
+                  livenessProbe:
+                      httpGet:
+                          path: /
+                          port: 80
+                      initialDelaySeconds: 10
+                      periodSeconds: 10
+                      timeoutSeconds: 5
+                  readinessProbe:
+                      httpGet:
+                          path: /
+                          port: 80
+                      initialDelaySeconds: 5
+                      periodSeconds: 5
+                      timeoutSeconds: 5

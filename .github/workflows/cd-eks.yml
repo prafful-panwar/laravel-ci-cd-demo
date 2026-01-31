@@ -1,0 +1,69 @@
+name: CD - Deploy to EKS
+
+on:
+    workflow_run:
+        workflows: ['CI - Build and Push Docker Images']
+        types:
+            - completed
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        permissions:
+            contents: read
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+            cancel-in-progress: true
+        environment: production
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Configure kubectl
+              run: |
+                  aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+                  kubectl version --client
+
+            - name: Deploy to EKS with Zero-Downtime Rolling Update
+              env:
+                  APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
+                  NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.sha }}
+              run: |
+                  echo "Deploying new image: ${APP_IMAGE}"
+
+                  # Update deployment with new image (rolling update)
+                  kubectl set image deployment/task-app \
+                    app=${APP_IMAGE} \
+                    nginx=${NGINX_IMAGE} \
+                    -n task-app
+
+                  # Wait for rollout to complete (zero-downtime)
+                  echo "Waiting for zero-downtime rolling update..."
+                  kubectl rollout status deployment/task-app -n task-app --timeout=5m
+
+                  # Verify deployment
+                  echo "Verifying deployment..."
+                  kubectl get pods -n task-app
+
+                  # Run migrations
+                  echo "Running database migrations..."
+                  POD_NAME=$(kubectl get pods -n task-app -l app=task-app -o jsonpath='{.items[0].metadata.name}')
+                  kubectl exec -n task-app ${POD_NAME} -c app -- php artisan migrate --force
+
+                  echo "Deployment completed successfully! ✅"
+
+            - name: Rollback on Failure
+              if: failure()
+              run: |
+                  echo "Deployment failed! Rolling back..."
+                  kubectl rollout undo deployment/task-app -n task-app
+                  kubectl rollout status deployment/task-app -n task-app
