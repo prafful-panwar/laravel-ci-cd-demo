@@ -70,8 +70,39 @@ jobs:
 
             - name: Configure kubectl
               run: |
+                  echo "⚙️  Configuring kubectl for EKS cluster..."
                   aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
                   kubectl version --client
+
+                  echo ""
+                  echo "🔍 Testing kubectl access to cluster..."
+                  if ! kubectl auth can-i get pods -n task-app 2>/dev/null; then
+                      echo ""
+                      echo "❌ ERROR: kubectl cannot access the EKS cluster!"
+                      echo ""
+                      echo "The GitHub Actions IAM user/role needs permission to access this cluster."
+                      echo ""
+                      echo "To fix this, run these commands locally:"
+                      echo ""
+                      echo "# 1. Get the IAM ARN that GitHub Actions is using:"
+                      echo "IAM_ARN=\"$(aws sts get-caller-identity --query Arn --output text)\""
+                      echo "echo \"GitHub Actions IAM ARN: \$IAM_ARN\""
+                      echo ""
+                      echo "# 2. Add this IAM user/role to your EKS cluster:"
+                      echo "eksctl create iamidentitymapping \\"
+                      echo "  --cluster ${{ secrets.EKS_CLUSTER_NAME }} \\"
+                      echo "  --region ${{ secrets.AWS_REGION }} \\"
+                      echo "  --arn \"\$IAM_ARN\" \\"
+                      echo "  --group system:masters \\"
+                      echo "  --username github-actions"
+                      echo ""
+                      echo "Or manually edit the aws-auth ConfigMap:"
+                      echo "kubectl edit configmap aws-auth -n kube-system"
+                      echo ""
+                      exit 1
+                  fi
+
+                  echo "✅ kubectl access verified!"
 
             - name: Deploy to EKS with Zero-Downtime Rolling Update
               env:
