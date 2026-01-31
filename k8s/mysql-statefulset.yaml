@@ -32,6 +32,13 @@ spec:
                   volumeMounts:
                       - name: mysql-data
                         mountPath: /var/lib/mysql
+                  resources:
+                      requests:
+                          memory: '256Mi'
+                          cpu: '100m'
+                      limits:
+                          memory: '512Mi'
+                          cpu: '500m'
                   livenessProbe:
                       exec:
                           command:

@@ -202,8 +202,13 @@ jobs:
                       
                       # Wait for migration to complete
                       kubectl wait --for=condition=complete job/laravel-migration -n task-app --timeout=5m || {
-                          echo "❌ Migration failed! Checking logs..."
-                          kubectl logs job/laravel-migration -n task-app
+                          echo "❌ Migration failed! Debugging..."
+                          # Check Pod status (Pending? Running?)
+                          kubectl get pods -n task-app
+                          # Describe Job to see events (Quota exceeded? Image pull error?)
+                          kubectl describe job/laravel-migration -n task-app
+                          # Get logs (if pod started)
+                          kubectl logs -l job-name=laravel-migration -n task-app --tail=50
                           exit 1
                       }
                       echo "✅ Migrations completed successfully."

@@ -46,6 +46,13 @@ spec:
                   ports:
                       - containerPort: 9000
                         name: php-fpm
+                  resources:
+                      requests:
+                          memory: '128Mi'
+                          cpu: '100m'
+                      limits:
+                          memory: '256Mi'
+                          cpu: '500m'
                   livenessProbe:
                       tcpSocket:
                           port: 9000
