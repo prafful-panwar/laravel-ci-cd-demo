@@ -115,7 +115,7 @@ jobs:
                       kubectl apply -k "https://github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.28"
                       
                       echo "⏳ Waiting for CSI driver to be ready..."
-                      kubectl wait --for=condition=Available deployment/ebs-csi-controller -n kube-system --timeout=2m
+                      kubectl wait --for=condition=Available deployment/ebs-csi-controller -n kube-system --timeout=5m
                       
                       echo "✅ EBS CSI Driver installed successfully"
                   fi
