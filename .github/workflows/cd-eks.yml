@@ -160,6 +160,22 @@ jobs:
                       kubectl apply -f k8s/nginx-configmap.yaml
                       kubectl apply -f k8s/mysql-pvc.yaml
                       kubectl apply -f k8s/mysql-statefulset.yaml
+                      
+                      # 1. Wait for MySQL (Critical for first run)
+                      echo "⏳ Waiting for MySQL to be ready..."
+                      kubectl wait --for=condition=Ready pod -l app=mysql -n task-app --timeout=5m
+
+                      # 2. Run Initial Migration
+                      echo "🚀 Running Initial Migration..."
+                      sed -i "s|image: .*|image: ${APP_IMAGE}|" k8s/migration-job.yaml
+                      kubectl delete job laravel-migration -n task-app --ignore-not-found
+                      kubectl apply -f k8s/migration-job.yaml
+                      kubectl wait --for=condition=complete job/laravel-migration -n task-app --timeout=5m || {
+                          echo "❌ Migration failed logs:"
+                          kubectl logs job/laravel-migration -n task-app
+                          exit 1
+                      }
+                      
                       kubectl apply -f k8s/deployment.yaml
                       kubectl apply -f k8s/service.yaml
                       
