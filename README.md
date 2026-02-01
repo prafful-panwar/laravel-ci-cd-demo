@@ -12,6 +12,8 @@
 
 ## Getting Started (Development)
 
+This repository includes comprehensive, step-by-step guides for development, deployment, and CI/CD. All necessary instructions are provided here so you should not need to consult other documentation to get the project running.
+
 <br>
 
 ---
@@ -156,6 +158,14 @@ To use either pipeline, go to **Settings > Secrets and variables > Actions** in 
 
 <br>
 <br>
+**Notes — generating these secrets**
+
+- AWS access keys: In the AWS Console go to **IAM → Users → _your username_ → Security credentials** and click **Create access key**. Save the **Access key ID** and **Secret access key** immediately — the secret is shown only once. (See `cd-eks.yml` for where these are used.)
+- Docker credentials: For `DOCKER_USERNAME` use your Docker Hub username. For `DOCKER_PASSWORD` we recommend creating a Docker Hub access token (Docker Hub → Account Settings → Security → New Access Token) and using that token rather than your account password.
+- EC2 SSH key: Use the private key you generated for GitHub Actions (for example `~/.ssh/github_actions_ec2`) — copy the full private key block into `EC2_SSH_KEY` as shown in the deployment guide.
+
+All of these steps are covered in this repository (see the deployment guide in `docker-hub-deployment/README.md`) so you shouldn't need to search for external instructions.
+
 
 ---
 
