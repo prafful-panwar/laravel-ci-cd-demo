@@ -79,7 +79,8 @@ You need to create three files in that folder. Copy the content from the links b
 
 1.  Create file: `nano .env`
 2.  **[Copy content from here](./.env.example)**.
-3.  **Edit:** Set `APP_PORT` (e.g., `80` for server, `8100` for local).
+3.  **Edit:** Set `APP_HOST` = `YOUR_SERVER_IP` (e.g., `192.168.1.10`) for server, `localhost` for local).
+4.  **Edit:** Set `APP_PORT` = `YOUR_APPLICATION_PORT` (e.g., `8000`, `8080`) or `80` for standard HTTP
 
 #### C. `deploy.sh`
 
@@ -132,24 +133,28 @@ docker compose exec app php artisan tinker
 
 To enable the **Automated** pipeline to deploy to this server, follow these steps:
 
-### Step 1: Create a dedicated SSH key pair for GitHub Actions
+### Step 1: Initial Server Configuration (Manual)
+
+Since every new server has a different IP address, you must manually log in, create the `~/deploy/task-app` folder, and configure your `.env` and `docker-compose.yml` files (as explained in the "Setup Instructions" above). The pipeline assumes these files already exist on the server.
+
+### Step 2: Create a dedicated SSH key pair for GitHub Actions
 
 - **Command:**
     ```bash
-    ssh-keygen -t ed25519 -f ~/.ssh/github_actions_ec2 -C "github-actions-ci"
+    ssh-keygen -t ed25519 -f ~/.ssh/your-key-name -C "github-actions-ci"
     ```
 - **Comment:** This generates a private/public SSH key pair used _only_ by GitHub Actions to securely connect to the EC2 instance. (Press Enter for empty passphrase).
     - **Private key** → used by **GitHub** (Secret)
     - **Public key** → added to **EC2** (Authorized Keys)
     - **Key Fingerprint Example:** `SHA256:gjwyv2rDlQ8gsfrqcOSl+K+6BhiNO+cHu+dV/Jan+Pc github-actions-ci`
 
-### Step 2: Add the public key to the EC2 instance
+### Step 3: Add the public key to the EC2 instance
 
 - **Commands on LOCAL:**
 
     ```bash
     # View the public key and copy for next step
-    cat ~/.ssh/github_actions_ec2.pub
+    cat ~/.ssh/your-key-name.pub
     ```
 
 - **Commands on EC2:**
@@ -162,20 +167,21 @@ To enable the **Automated** pipeline to deploy to this server, follow these step
     chmod 600 ~/.ssh/authorized_keys
     ```
 
- **Comment:** Registering the public key enables passwordless SSH access for CI/CD while enforcing correct SSH permissions.
+    **Comment:** Registering the public key enables passwordless SSH access for CI/CD while enforcing correct SSH permissions.
 
-- To manually verify SSH access from the machine that will run GitHub Actions, run (replace the someIpAddress with your `EC2_HOST`):
+- To manually verify SSH access from the machine that will run GitHub Actions, run (replace the `your-server-ip` with your `EC2_HOST`):
 
     ```bash
-    ssh -i ~/.ssh/github_actions_ec2 ubuntu@someIpAddress
+    ssh -i ~/.ssh/your-key-name ubuntu@your-server-ip
     ```
 
-### Step 3: Store the private key in GitHub Secrets
+### Step 4: Store the private key in GitHub Secrets
+
 - On the machine where you generated the SSH key, run the following to view the private key (do NOT share this publicly):
 
     ```bash
     # View the private key
-    cat ~/.ssh/github_actions_ec2
+    cat ~/.ssh/your-key-name
     ```
 
 - Go to: GitHub Repository → Settings → Secrets and variables → Actions and click on New repository secret and copy the entire private key exactly as printed and paste it into the `EC2_SSH_KEY` secret. Preserve its multiline format. Ensure the BEGIN and END header/footer lines each appear on their own line. For example:
@@ -186,9 +192,9 @@ To enable the **Automated** pipeline to deploy to this server, follow these step
     -----END OPENSSH PRIVATE KEY-----
     ```
 
--  These secrets are injected into GitHub Actions at runtime and are never committed to the repository.
+- These secrets are injected into GitHub Actions at runtime and are never committed to the repository.
 
-### Step 4: Add basic connection secrets
+### Step 5: Add basic connection secrets
 
 After adding the private key, create the remaining connection secrets:
 
@@ -226,3 +232,4 @@ If a deployment fails (or you just want a fresh start) without destroying your e
 3.  **Deploy Again:**
     ```bash
     ./deploy.sh
+    ```

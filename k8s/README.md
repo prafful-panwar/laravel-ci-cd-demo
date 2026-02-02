@@ -48,7 +48,22 @@ This infrastructure is engineered to run a full production stack on a single **t
 2. eksctl installed
 3. kubectl configured
 
-### 1. Create EKS Cluster (Cost-Optimized)
+### 1. Configure AWS Credentials 🔑
+
+**Before running any commands**, you must authorize your terminal with AWS. This ensures `eksctl` has permission to create resources.
+
+```bash
+aws configure
+```
+
+You will be prompted to enter:
+
+- **AWS Access Key ID**: (Your IAM User Access Key)
+- **AWS Secret Access Key**: (Your IAM User Secret Key)
+- **Default region name**: `us-east-1` (Or your preferred region)
+- **Default output format**: `json`
+
+### 2. Create EKS Cluster (Cost-Optimized)
 
 > **Note:** If you change the `--name` below, make sure to update it in all subsequent commands and GitHub Secrets.
 
@@ -68,7 +83,7 @@ eksctl create cluster \
 - **--with-oidc:** Enables IAM roles for Service Accounts (Required for storage).
 - **--managed:** Uses AWS Managed Node Groups for stability.
 
-### 1.1 Enable Storage (EBS CSI Driver) 💾
+### 2.1 Enable Storage (EBS CSI Driver) 💾
 
 **Critical Step:** Installing this addon allows your cluster to create Persistent Volumes (EBS) for the Database. Without this, MySQL will fail.
 
@@ -84,7 +99,7 @@ _(Replace `task-app-cluster` with your actual cluster name if different)._
 
 This setup takes ~15-20 minutes total.
 
-### 2. Configure Local Access (Optional) 🖥️
+### 3. Configure Local Access (Optional) 🖥️
 
 Run this if you want to run `kubectl` commands from your local computer (debugging, checking pods).
 
@@ -92,7 +107,7 @@ Run this if you want to run `kubectl` commands from your local computer (debuggi
 aws eks update-kubeconfig --region us-east-1 --name task-app-cluster
 ```
 
-### 3. Deploy (Automated via GitHub Actions) 🚀
+### 4. Deploy (Automated via GitHub Actions) 🚀
 
 You do **NOT** need to deploy manually.
 
@@ -169,7 +184,7 @@ kubectl delete namespace task-app
 
 For learning or testing, use minikube locally (free) or k3s on a single server.
 
-### 4. Need to Start Over? (Destroy Infrastructure) 🧨
+### 5. Need to Start Over? (Destroy Infrastructure) 🧨
 
 To completely remove the cluster and stop all costs:
 
