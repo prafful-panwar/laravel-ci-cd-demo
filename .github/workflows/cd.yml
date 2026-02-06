@@ -19,7 +19,7 @@ jobs:
 
         steps:
             - name: Deploy to EC2 via SSH
-              uses: appleboy/ssh-action@v1.0.3
+              uses: appleboy/ssh-action@v1.2.5
               env:
                   APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
                   NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.sha }}
