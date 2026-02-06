@@ -57,7 +57,7 @@ jobs:
                   cache-to: type=gha,mode=max,scope=nginx
 
             - name: Scan app image with Trivy
-              uses: aquasecurity/trivy-action@0.20.0
+              uses: aquasecurity/trivy-action@0.33.1
               with:
                   image-ref: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
                   format: 'table'
@@ -67,7 +67,7 @@ jobs:
                   exit-code: '1'
 
             - name: Scan nginx image with Trivy
-              uses: aquasecurity/trivy-action@0.20.0
+              uses: aquasecurity/trivy-action@0.33.1
               with:
                   image-ref: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.sha }}
                   format: 'table'
