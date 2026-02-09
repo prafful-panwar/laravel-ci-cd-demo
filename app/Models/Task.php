@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property TaskStatus $status
+ */
 class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */

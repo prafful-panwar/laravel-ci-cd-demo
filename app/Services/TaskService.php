@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\Task\CreateTaskDTO;
 use App\DTOs\Task\UpdateTaskDTO;
+use App\Events\TaskCreated;
 use App\Models\Task;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -38,7 +39,11 @@ class TaskService
      */
     public function createTask(CreateTaskDTO $dto): Task
     {
-        return Task::create($dto->toArray());
+        $task = Task::create($dto->toArray());
+
+        TaskCreated::dispatch($task);
+
+        return $task;
     }
 
     /**

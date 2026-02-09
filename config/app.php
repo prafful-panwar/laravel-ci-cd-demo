@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'task_notification_email' => env('TASK_NOTIFICATION_EMAIL', 'admin@example.com'),
+
 ];
