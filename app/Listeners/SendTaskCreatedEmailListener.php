@@ -10,6 +10,15 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
+/**
+ * Listener that sends email notifications when a task is created.
+ *
+ * This listener is queued and will retry up to 3 times with exponential backoff
+ * (10s, 30s, 60s) if the email fails to send.
+ *
+ * @see \App\Events\TaskCreated
+ * @see \App\Notifications\TaskCreatedEmailNotification
+ */
 class SendTaskCreatedEmailListener implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -31,6 +40,11 @@ class SendTaskCreatedEmailListener implements ShouldQueue
 
     /**
      * Handle the event.
+     *
+     * Sends an email notification to the configured admin email address
+     * if the 'task_notification_email' config value is set.
+     *
+     * @param  TaskCreated  $event  The task created event instance
      */
     public function handle(TaskCreated $event): void
     {

@@ -10,6 +10,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Listener that sends push notifications when a task is created.
+ *
+ * This is currently a placeholder implementation that logs the event.
+ * In production, this would integrate with a push notification service (e.g., FCM, APNs).
+ *
+ * This listener is queued and will retry up to 3 times with exponential backoff
+ * (10s, 30s, 60s) if the push notification fails to send.
+ *
+ * @see \App\Events\TaskCreated
+ * @see \App\Notifications\TaskCreatedPushNotification
+ */
 class SendTaskCreatedPushListener implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -31,6 +43,11 @@ class SendTaskCreatedPushListener implements ShouldQueue
 
     /**
      * Handle the event.
+     *
+     * Currently logs the task creation event. In production, this would
+     * send a push notification via a service like FCM or APNs.
+     *
+     * @param  TaskCreated  $event  The task created event instance
      */
     public function handle(TaskCreated $event): void
     {

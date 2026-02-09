@@ -10,6 +10,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Listener that sends SMS notifications when a task is created.
+ *
+ * This is currently a placeholder implementation that logs the event.
+ * In production, this would integrate with an SMS provider (e.g., Nexmo, Twilio).
+ *
+ * This listener is queued and will retry up to 3 times with exponential backoff
+ * (10s, 30s, 60s) if the SMS fails to send.
+ *
+ * @see \App\Events\TaskCreated
+ * @see \App\Notifications\TaskCreatedSmsNotification
+ */
 class SendTaskCreatedSmsListener implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -31,6 +43,11 @@ class SendTaskCreatedSmsListener implements ShouldQueue
 
     /**
      * Handle the event.
+     *
+     * Currently logs the task creation event. In production, this would
+     * send an SMS notification via a service like Nexmo or Twilio.
+     *
+     * @param  TaskCreated  $event  The task created event instance
      */
     public function handle(TaskCreated $event): void
     {
