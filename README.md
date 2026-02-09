@@ -18,6 +18,9 @@ Laravel application can be built, tested, and deployed using **GitHub Actions**,
 A simple **REST-based task application** is used to validate the complete
 end-to-end CI/CD pipeline.
 
+> [!TIP]
+> 📚 **Laravel Best Practices Showcase:** Beyond CI/CD, this repository demonstrates modern Laravel API architecture including **DTOs** (Data Transfer Objects), **API Resources**, **Service Layer**, **Events & Listeners**, and **Queued Jobs** — providing a reference implementation for structuring production-grade Laravel applications.
+
 ## Getting Started (Development)
 
 This repository includes comprehensive, step-by-step guides for development, deployment, and CI/CD. All necessary instructions are provided here so you should not need to consult other documentation to get the project running.
