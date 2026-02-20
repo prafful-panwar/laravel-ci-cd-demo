@@ -16,7 +16,7 @@ jobs:
             cancel-in-progress: true
 
         steps:
-            - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+            - uses: shivammathur/setup-php@3aeeb0366058fd8efb58f4d53b5717a49bcb5226
               with:
                   php-version: '8.4'
             - uses: actions/checkout@v4
