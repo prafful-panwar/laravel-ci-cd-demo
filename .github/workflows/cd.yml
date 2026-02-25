@@ -21,8 +21,8 @@ jobs:
             - name: Deploy to EC2 via SSH
               uses: appleboy/ssh-action@v1.0.3
               env:
-                  APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.event.workflow_run.head_sha }}
-                  NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.event.workflow_run.head_sha }}
+                  APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
+                  NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.sha }}
                   DB_VOLUME_NAME: task-app-dbdata
                   COMPOSE_PROJECT_NAME: task-app
               with:
