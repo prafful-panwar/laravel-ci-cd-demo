@@ -1,5 +1,10 @@
 FROM php:8.4-fpm
 
+LABEL org.opencontainers.image.title="Laravel Task App" \
+    org.opencontainers.image.description="Laravel 12 PHP-FPM Docker image with CI/CD pipeline using GitHub Actions" \
+    org.opencontainers.image.source="https://github.com/prafful-panwar/laravel-ci-cd-demo" \
+    org.opencontainers.image.licenses="MIT"
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
