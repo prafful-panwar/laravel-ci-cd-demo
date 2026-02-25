@@ -3,5 +3,11 @@ ARG APP_IMAGE
 FROM ${APP_IMAGE:-praffulpanwar2016/task-app-ci-cd-demo:latest} AS app
 
 FROM nginx:alpine
+
+LABEL org.opencontainers.image.title="Laravel Task App - Nginx" \
+    org.opencontainers.image.description="Nginx reverse proxy Docker image for Laravel CI/CD demo using GitHub Actions" \
+    org.opencontainers.image.source="https://github.com/prafful-panwar/laravel-ci-cd-demo" \
+    org.opencontainers.image.licenses="MIT"
+
 COPY docker/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=app /var/www/public /var/www/public
