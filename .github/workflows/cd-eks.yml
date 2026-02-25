@@ -160,8 +160,8 @@ jobs:
 
             - name: Deploy to EKS with Zero-Downtime Rolling Update
               env:
-                  APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.sha }}
-                  NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.sha }}
+                  APP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-ci-cd-demo:${{ github.event.workflow_run.head_sha }}
+                  NGINX_IMAGE: ${{ secrets.DOCKER_USERNAME }}/task-app-nginx:${{ github.event.workflow_run.head_sha }}
               run: |
                   echo "Deploying new image: ${APP_IMAGE}"
 
